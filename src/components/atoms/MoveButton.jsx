@@ -3,6 +3,7 @@ import { Link } from 'gatsby'
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/core/styles'
 import Icon from '@material-ui/core/Icon'
+import Typography from '@material-ui/core/Typography'
 
 const styles = theme => ({
   link: {
@@ -14,6 +15,9 @@ const styles = theme => ({
   },
   rightIcon: {
     marginLeft: theme.spacing.unit,
+  },
+  buttonText: {
+    width: 100,
   },
 })
 
@@ -30,7 +34,14 @@ class Move extends Component {
           {rel === 'prev' && (
             <Icon className={`fas fa-arrow-left ${classes.leftIcon}`} />
           )}
-          {direction.frontmatter.title}
+          <Typography
+            variant="button"
+            color="inherit"
+            noWrap={true}
+            className={classes.buttonText}
+          >
+            {direction.frontmatter.title}
+          </Typography>
           {rel === 'next' && (
             <Icon className={`fas fa-arrow-right ${classes.rightIcon}`} />
           )}
