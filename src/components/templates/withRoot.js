@@ -11,24 +11,24 @@ function withRoot(Component) {
       this.muiPageContext = getPageContext()
     }
 
-    componentDidMount() {
-      // Remove the server-side injected CSS.
+    /* componentDidMount() {
       const jssStyles = document.querySelector('#jss-server-side')
       if (jssStyles && jssStyles.parentNode) {
         jssStyles.parentNode.removeChild(jssStyles)
       }
-    }
+    } */
 
     render() {
       return (
-        <JssProvider generateClassName={this.muiPageContext.generateClassName}>
-          {/* Make the theme available down the React tree. */}
+        <JssProvider
+          registry={this.muiPageContext.sheetsRegistry}
+          generateClassName={this.muiPageContext.generateClassName}
+        >
           <MuiThemeProvider
             theme={this.muiPageContext.theme}
             sheetsManager={this.muiPageContext.sheetsManager}
           >
-            {/* Kickstart a simple baseline to build upon. */}
-            <CssBaseline />
+            {/* <CssBaseline /> */}
             <Component {...this.props} />
           </MuiThemeProvider>
         </JssProvider>
