@@ -7,7 +7,7 @@ exports.createPages = ({ graphql, actions }) => {
   const { createPage } = actions
 
   return new Promise((resolve, reject) => {
-    const BlogPost = path.resolve('./src/components/organisms/BlogPost.jsx')
+    const BlogPost = path.resolve('./src/components/pages/BlogPost.jsx')
 
     resolve(
       graphql(
@@ -23,6 +23,7 @@ exports.createPages = ({ graphql, actions }) => {
                   frontmatter {
                     title
                     date(formatString: "YYYY.MM.DD")
+                    tags
                   }
                   fields {
                     slug
@@ -60,7 +61,7 @@ exports.createPages = ({ graphql, actions }) => {
         // Create blog posts pages.
         const posts = result.data.posts.edges
 
-        posts.map(({ node }, index) => {
+        posts.forEach(({ node }, index) => {
           const previous =
             index === posts.length - 1 ? null : posts[index + 1].node
           const next = index === 0 ? null : posts[index - 1].node

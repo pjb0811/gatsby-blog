@@ -1,7 +1,13 @@
 ---
 title: Hello World
 date: '2015-05-01T22:12:03.284Z'
-tags: 'testasdf'
+tags:
+  - 번역
+  - JavaScript
+  - React
+  - Redux
+  - Gatsby
+  - ES6
 ---
 
 This is my first post on my new fake blog! How exciting!

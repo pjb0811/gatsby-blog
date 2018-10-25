@@ -1,7 +1,13 @@
 ---
 title: New Beginnings
 date: '2015-05-28T22:40:32.169Z'
-tags: 'testasdf'
+tags:
+  - 번역
+  - JavaScript
+  - React
+  - Redux
+  - Gatsby
+  - ES6
 ---
 
 Far far away, behind the word mountains, far from the countries Vokalia and

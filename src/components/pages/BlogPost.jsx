@@ -28,6 +28,8 @@ class BlogPost extends React.Component {
       title: post.frontmatter.title,
     }
 
+    console.log(post)
+
     return (
       <Layout location={this.props.location}>
         <Helmet
@@ -67,6 +69,7 @@ export const pageQuery = graphql`
       frontmatter {
         title
         date(formatString: "YYYY.MM.DD")
+        tags
       }
     }
   }

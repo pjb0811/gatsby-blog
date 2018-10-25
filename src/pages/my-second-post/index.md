@@ -1,7 +1,13 @@
 ---
 title: My Second Post!
 date: '2015-05-06T23:46:37.121Z'
-tags: 'testasdf'
+tags:
+  - 번역
+  - JavaScript
+  - React
+  - Redux
+  - Gatsby
+  - ES6
 ---
 
 Wow! I love blogging so much already.
