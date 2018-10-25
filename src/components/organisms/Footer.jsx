@@ -4,22 +4,20 @@ import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import gatsbyIcon from '../../assets/gatsby.png'
 
-const styles = theme => {
-  return {
-    root: {
-      padding: 20,
-      background: theme.palette.grey['200'],
-    },
-    caption: {
-      textAlign: 'center',
-    },
-    gatsby: {
-      width: 24,
-      height: 24,
-      verticalAlign: 'middle',
-    },
-  }
-}
+const styles = theme => ({
+  root: {
+    padding: 20,
+    background: theme.palette.grey['200'],
+  },
+  caption: {
+    textAlign: 'center',
+  },
+  gatsby: {
+    width: 24,
+    height: 24,
+    verticalAlign: 'middle',
+  },
+})
 
 class Footer extends Component {
   render() {

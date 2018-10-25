@@ -42,7 +42,9 @@
     "eslint-plugin-react": "^7.11.1",
     "fg-loadcss": "^2.0.1",
     "gh-pages": "^1.2.0",
+    "jss": "^9.8.7",
     "prettier": "^1.14.2",
+    "react-jss": "^8.6.1",
     "typeface-roboto": "^0.0.54"
   },
   "homepage": "https://github.com/pjb0811/gatsby-blog.git#readme",

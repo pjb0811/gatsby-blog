@@ -1,24 +1,12 @@
 import React from 'react'
 import AppBar from '../organisms/AppBar'
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 // import { loadCSS } from 'fg-loadcss/src/loadCSS'
 import { withStyles } from '@material-ui/core/styles'
 import Footer from '../organisms/Footer'
 import 'typeface-roboto'
 import './layout.css'
+import withRoot from './withRoot'
 import Helmet from 'react-helmet'
-// import CssBaseline from '@material-ui/core/CssBaseline'
-
-const theme = createMuiTheme({
-  typography: {
-    useNextVariants: true,
-  },
-  palette: {
-    primary: {
-      main: '#448AFF',
-    },
-  },
-})
 
 const styles = theme => ({
   root: {
@@ -42,7 +30,7 @@ class Layout extends React.Component {
     const { children, classes } = this.props
 
     return (
-      <MuiThemeProvider theme={theme}>
+      <div className={classes.root}>
         <Helmet>
           <link
             rel="stylesheet"
@@ -50,16 +38,13 @@ class Layout extends React.Component {
             media="all"
           />
         </Helmet>
-        {/* <CssBaseline /> */}
-        <div className={classes.root}>
-          <AppBar />
-          <div className={classes.toolbar} />
-          {children}
-          <Footer />
-        </div>
-      </MuiThemeProvider>
+        <AppBar />
+        <div className={classes.toolbar} />
+        {children}
+        <Footer />
+      </div>
     )
   }
 }
 
-export default withStyles(styles)(Layout)
+export default withRoot(withStyles(styles)(Layout))
