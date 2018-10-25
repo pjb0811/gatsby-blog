@@ -1,36 +1,28 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import AppBar from '../organisms/AppBar'
 // import { loadCSS } from 'fg-loadcss/src/loadCSS'
-import { withStyles } from '@material-ui/core/styles'
+// import { withStyles } from '@material-ui/core/styles'
 import Footer from '../organisms/Footer'
 import 'typeface-roboto'
 import './layout.css'
 import withRoot from './withRoot'
 import Helmet from 'react-helmet'
 
-const styles = theme => ({
-  root: {
-    flexGrow: 1,
-  },
-  toolbar: {
-    ...theme.mixins.toolbar,
-    marginBottom: 10,
-  },
-})
-
 class Layout extends React.Component {
-  /* componentDidMount() {
+  /*
+  componentDidMount() {
     loadCSS(
       'https://use.fontawesome.com/releases/v5.1.0/css/all.css',
       document.querySelector('#___gatsby')
     )
-  } */
+  }
+  */
 
   render() {
-    const { children, classes } = this.props
+    const { children } = this.props
 
     return (
-      <div className={classes.root}>
+      <Fragment>
         <Helmet>
           <link
             rel="stylesheet"
@@ -39,12 +31,11 @@ class Layout extends React.Component {
           />
         </Helmet>
         <AppBar />
-        <div className={classes.toolbar} />
         {children}
         <Footer />
-      </div>
+      </Fragment>
     )
   }
 }
 
-export default withRoot(withStyles(styles)(Layout))
+export default withRoot(Layout)
