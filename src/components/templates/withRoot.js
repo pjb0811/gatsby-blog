@@ -11,12 +11,12 @@ function withRoot(Component) {
       this.muiPageContext = getPageContext()
     }
 
-    /* componentDidMount() {
+    componentDidMount() {
       const jssStyles = document.querySelector('#jss-server-side')
       if (jssStyles && jssStyles.parentNode) {
         jssStyles.parentNode.removeChild(jssStyles)
       }
-    } */
+    }
 
     render() {
       return (
@@ -28,7 +28,7 @@ function withRoot(Component) {
             theme={this.muiPageContext.theme}
             sheetsManager={this.muiPageContext.sheetsManager}
           >
-            {/* <CssBaseline /> */}
+            <CssBaseline />
             <Component {...this.props} />
           </MuiThemeProvider>
         </JssProvider>
