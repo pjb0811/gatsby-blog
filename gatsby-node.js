@@ -1,30 +1,41 @@
-const _ = require('lodash')
 const Promise = require('bluebird')
 const path = require('path')
 const { createFilePath } = require('gatsby-source-filesystem')
+const createPaginatedPages = require('gatsby-paginate')
 
 exports.createPages = ({ graphql, actions }) => {
   const { createPage } = actions
 
   return new Promise((resolve, reject) => {
     const BlogPost = path.resolve('./src/components/organisms/BlogPost.jsx')
+
     resolve(
       graphql(
         `
           {
-            allMarkdownRemark(
+            posts: allMarkdownRemark(
               sort: { fields: [frontmatter___date], order: DESC }
-              limit: 1000
             ) {
               edges {
                 node {
+                  id
+                  excerpt
+                  frontmatter {
+                    title
+                    date(formatString: "YYYY.MM.DD")
+                  }
                   fields {
                     slug
                   }
-                  frontmatter {
-                    title
-                  }
                 }
+              }
+            }
+            site {
+              siteMetadata {
+                title
+                author
+                description
+                siteUrl
               }
             }
           }
@@ -35,19 +46,30 @@ exports.createPages = ({ graphql, actions }) => {
           reject(result.errors)
         }
 
-        // Create blog posts pages.
-        const posts = result.data.allMarkdownRemark.edges
+        createPaginatedPages({
+          edges: result.data.posts.edges,
+          createPage: createPage,
+          pageTemplate: 'src/components/pages/index.jsx',
+          pageLength: 5, // This is optional and defaults to 10 if not used
+          pathPrefix: '', // This is optional and defaults to an empty string if not used
+          context: {
+            ...result.data.site,
+          }, // This is optional and defaults to an empty object if not used
+        })
 
-        _.each(posts, (post, index) => {
+        // Create blog posts pages.
+        const posts = result.data.posts.edges
+
+        posts.map(({ node }, index) => {
           const previous =
             index === posts.length - 1 ? null : posts[index + 1].node
           const next = index === 0 ? null : posts[index - 1].node
 
           createPage({
-            path: post.node.fields.slug,
+            path: node.fields.slug,
             component: BlogPost,
             context: {
-              slug: post.node.fields.slug,
+              slug: node.fields.slug,
               previous,
               next,
             },

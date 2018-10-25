@@ -12,6 +12,9 @@ const typography = new Typography({
       'a.icon': {
         fontSize: 'initial',
       },
+      'a img': {
+        marginBottom: 0,
+      },
     }
   },
 })
