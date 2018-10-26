@@ -1,13 +1,20 @@
 import React, { Component } from 'react'
-import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
 import { withStyles } from '@material-ui/core/styles'
+import Typography from '@material-ui/core/Typography'
 
 const styles = theme => ({
-  paper: {
-    padding: theme.spacing.unit * 2,
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    height: 300,
+  },
+  text: {
+    color: '#fff',
+    fontWeight: 500,
+  },
+  subtitle: {
+    marginTop: 20,
   },
 })
 
@@ -16,15 +23,18 @@ class Jumbotron extends Component {
     const { classes } = this.props
 
     return (
-      <Paper className={classes.paper}>
-        <Typography variant="h5" component="h3">
-          This is a sheet of paper.
+      <div className={classes.root}>
+        <Typography variant="h3" align="center" className={classes.text}>
+          Welcome to my blog!
         </Typography>
-        <Typography component="p">
-          Paper can be used to build surface or other elements for your
-          application.
+        <Typography
+          variant="subtitle1"
+          align="center"
+          className={`${classes.text} ${classes.subtitle}`}
+        >
+          Introduce React, TypeScript, and JavaScript related postings.
         </Typography>
-      </Paper>
+      </div>
     )
   }
 }

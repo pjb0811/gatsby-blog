@@ -10,9 +10,9 @@ const typography = new Typography({
         textDecoration: 'none',
       },
       'a.icon': {
-        fontSize: 'initial',
+        display: 'inline-flex;',
       },
-      'a img': {
+      img: {
         marginBottom: 0,
       },
     }

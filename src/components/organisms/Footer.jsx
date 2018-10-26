@@ -3,19 +3,26 @@ import { withStyles } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import gatsbyIcon from '../../assets/gatsby.png'
+import IconButton from '@material-ui/core/IconButton'
+import Icon from '@material-ui/core/Icon'
 
 const styles = theme => ({
   root: {
     padding: 20,
-    background: theme.palette.grey['200'],
+    background: theme.palette.secondary.main,
   },
-  caption: {
+  icons: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  text: {
     textAlign: 'center',
   },
   gatsby: {
     width: 24,
     height: 24,
     verticalAlign: 'middle',
+    marginLeft: 10,
   },
 })
 
@@ -28,14 +35,31 @@ class Footer extends Component {
           <Typography
             variant="subtitle2"
             color="inherit"
-            className={classes.caption}
+            className={classes.text}
           >
             Copyright © 2018. pjb0811 All rights reserved.
           </Typography>
+          <div className={classes.icons}>
+            <IconButton color="inherit">
+              <a href="https://github.com/pjb0811" className="icon">
+                <Icon className={'fab fa-github'} fontSize="small" />
+              </a>
+            </IconButton>
+            <IconButton color="inherit">
+              <a href="mailto:pjb0811@gmail.com" className="icon">
+                <Icon className={'far fa-envelope'} fontSize="small" />
+              </a>
+            </IconButton>
+            <IconButton color="inherit">
+              <a href="/rss.xml" className="icon">
+                <Icon className={'fas fa-rss'} fontSize="small" />
+              </a>
+            </IconButton>
+          </div>
           <Typography
             variant="subtitle2"
             color="inherit"
-            className={classes.caption}
+            className={classes.text}
           >
             Powered by{' '}
             <a href="https://www.gatsbyjs.org/">

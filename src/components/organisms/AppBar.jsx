@@ -5,11 +5,15 @@ import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
-import Icon from '@material-ui/core/Icon'
+import MenuIcon from '@material-ui/icons/Menu'
+import AppMenu from '../molecules/AppMenu'
+import SearchBox from '../molecules/SearchBox'
+import Drawer from '@material-ui/core/Drawer'
+import SideList from '../molecules/SideList'
 
 const styles = theme => ({
   root: {
-    flexGrow: 1,
+    width: '100%',
   },
   grow: {
     flexGrow: 1,
@@ -22,34 +26,66 @@ const styles = theme => ({
     ...theme.mixins.toolbar,
     marginBottom: 10,
   },
+  title: {
+    display: 'none',
+    [theme.breakpoints.up('sm')]: {
+      display: 'block',
+    },
+  },
 })
 
 class ButtonAppBar extends Component {
+  state = {
+    drawer: {
+      open: false,
+    },
+  }
+
+  toggleDrawer = open => () => {
+    this.setState({
+      drawer: {
+        open,
+      },
+    })
+  }
+
   render() {
     const { classes } = this.props
+    const { drawer } = this.state
+
     return (
       <Fragment>
+        <Drawer open={drawer.open} onClose={this.toggleDrawer(false)}>
+          <div
+            tabIndex={0}
+            role="button"
+            onClick={this.toggleDrawer(false)}
+            onKeyDown={this.toggleDrawer(false)}
+          >
+            <SideList />
+          </div>
+        </Drawer>
         <div className={classes.root}>
           <AppBar position="fixed">
             <Toolbar>
-              <Typography variant="h6" color="inherit" className={classes.grow}>
+              <IconButton
+                className={classes.menuButton}
+                color="inherit"
+                aria-label="Menu"
+                onClick={this.toggleDrawer(true)}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography
+                variant="h6"
+                color="inherit"
+                className={classes.title}
+              >
                 <Link to={'/'}>pjb0811.github.io</Link>
               </Typography>
-              <IconButton color="inherit">
-                <a href="https://github.com/pjb0811" className="icon">
-                  <Icon className={'fab fa-github'} />
-                </a>
-              </IconButton>
-              <IconButton color="inherit">
-                <a href="mailto:pjb0811@gmail.com" className="icon">
-                  <Icon className={'far fa-envelope'} />
-                </a>
-              </IconButton>
-              <IconButton color="inherit">
-                <a href="/rss.xml" className="icon">
-                  <Icon className={'fas fa-rss'} />
-                </a>
-              </IconButton>
+              <div className={classes.grow} />
+              <SearchBox />
+              <AppMenu />
             </Toolbar>
           </AppBar>
         </div>

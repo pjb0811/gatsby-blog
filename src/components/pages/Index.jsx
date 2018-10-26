@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import Helmet from 'react-helmet'
 import Layout from '../templates/Layout'
-import Jumbotron from '../organisms/Jumbotron'
+import ImageCover from '../organisms/ImageCover'
 import PostList from '../organisms/PostList'
 import { navigate } from 'gatsby-link'
 import Paginate from '../organisms/Paginate'
+import jsImage from '../../assets/javascript.jpg'
+import Jumbotron from '../organisms/Jumbotron'
 
 class Index extends Component {
   handlePageClick = data => {
@@ -30,7 +32,9 @@ class Index extends Component {
           ]}
           title={siteMetadata.title}
         />
-        <Jumbotron />
+        <ImageCover img={jsImage} alt="javascript">
+          <Jumbotron />
+        </ImageCover>
         <PostList posts={group} />
         <Paginate
           index={index}
