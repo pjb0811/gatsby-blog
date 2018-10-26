@@ -80,8 +80,10 @@ class ButtonAppBar extends Component {
                 variant="h6"
                 color="inherit"
                 className={classes.title}
+                component={Link}
+                to={'/'}
               >
-                <Link to={'/'}>pjb0811.github.io</Link>
+                pjb0811.github.io
               </Typography>
               <div className={classes.grow} />
               <SearchBox />

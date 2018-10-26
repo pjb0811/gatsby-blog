@@ -25,20 +25,18 @@ class PostCard extends Component {
     return (
       <Grid item xs={12}>
         <Card className={classes.card}>
-          <CardActionArea>
-            <Link to={node.fields.slug}>
-              <CardMedia
-                className={classes.media}
-                image={mainImage.childImageSharp.sizes.src}
-                title={title || node.fields.slug}
-              />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="h2">
-                  {title || node.fields.slug}
-                </Typography>
-                <Typography component="p">{node.excerpt}</Typography>
-              </CardContent>
-            </Link>
+          <CardActionArea component={Link} to={node.fields.slug}>
+            <CardMedia
+              className={classes.media}
+              image={mainImage.childImageSharp.sizes.src}
+              title={title || node.fields.slug}
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                {title || node.fields.slug}
+              </Typography>
+              <Typography component="p">{node.excerpt}</Typography>
+            </CardContent>
           </CardActionArea>
           <CardActions>
             {tags.map((tag, i) => (

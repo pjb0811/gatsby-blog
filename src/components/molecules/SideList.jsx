@@ -31,8 +31,14 @@ class SideList extends Component {
     return (
       <div className={classes.list}>
         <div className={classes.toolbar}>
-          <Typography variant="h6" color="inherit" className={classes.title}>
-            <Link to={'/'}>pjb0811.github.io</Link>
+          <Typography
+            variant="h6"
+            color="inherit"
+            className={classes.title}
+            component={Link}
+            to="/"
+          >
+            pjb0811.github.io
           </Typography>
         </div>
         <Divider />
@@ -46,15 +52,13 @@ class SideList extends Component {
               <ListItemText primary={'github'} />
             </ListItem>
           </a>
-          <a href="/tags">
-            <ListItem button>
-              <ListItemIcon>
-                <Icon className={'fas fa-tag'} />
-              </ListItemIcon>
+          <ListItem button component={Link} to="/tags">
+            <ListItemIcon>
+              <Icon className={'fas fa-tag'} />
+            </ListItemIcon>
 
-              <ListItemText primary={'tags'} />
-            </ListItem>
-          </a>
+            <ListItemText primary={'tags'} />
+          </ListItem>
           <a href="mailto:pjb0811@gmail.com">
             <ListItem button>
               <ListItemIcon>

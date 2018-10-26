@@ -5,6 +5,18 @@ const typography = new Typography({
   ...githubTheme,
   overrideStyles: ({ rhythm, scale }, options) => {
     return {
+      html: {
+        height: '100%',
+      },
+      body: {
+        height: '100%',
+      },
+      '#___gatsby': {
+        height: '100%',
+      },
+      '#___gatsby>div': {
+        height: '100%',
+      },
       a: {
         color: 'inherit',
         textDecoration: 'none',

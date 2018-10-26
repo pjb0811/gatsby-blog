@@ -4,7 +4,6 @@ import AppBar from '../organisms/AppBar'
 // import { withStyles } from '@material-ui/core/styles'
 import Footer from '../organisms/Footer'
 import 'typeface-roboto'
-import './layout.css'
 import withRoot from './withRoot'
 import Helmet from 'react-helmet'
 
