@@ -2,13 +2,7 @@
 title: Hello World
 date: '2015-05-01T22:12:03.284Z'
 mainImage: './salty_egg.jpg'
-tags:
-  - 번역
-  - JavaScript
-  - React
-  - Redux
-  - Gatsby
-  - ES6
+tags: ['nextjs']
 ---
 
 This is my first post on my new fake blog! How exciting!
