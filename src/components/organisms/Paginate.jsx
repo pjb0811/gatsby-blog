@@ -6,7 +6,7 @@ import { withStyles } from '@material-ui/core/styles'
 const styles = theme => ({
   pagination: {
     display: 'flex',
-    margin: '0 0 20px 0',
+    margin: '20px 0',
     listStyle: 'none',
     justifyContent: 'center',
   },

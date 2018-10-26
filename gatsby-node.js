@@ -24,6 +24,17 @@ exports.createPages = ({ graphql, actions }) => {
                     title
                     date(formatString: "YYYY.MM.DD")
                     tags
+                    mainImage {
+                      childImageSharp {
+                        sizes(maxWidth: 800) {
+                          aspectRatio
+                          base64
+                          sizes
+                          src
+                          srcSet
+                        }
+                      }
+                    }
                   }
                   fields {
                     slug

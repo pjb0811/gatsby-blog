@@ -28,8 +28,6 @@ class BlogPost extends React.Component {
       title: post.frontmatter.title,
     }
 
-    console.log(post)
-
     return (
       <Layout location={this.props.location}>
         <Helmet
@@ -70,6 +68,17 @@ export const pageQuery = graphql`
         title
         date(formatString: "YYYY.MM.DD")
         tags
+        mainImage {
+          childImageSharp {
+            sizes(maxWidth: 800) {
+              aspectRatio
+              base64
+              sizes
+              src
+              srcSet
+            }
+          }
+        }
       }
     }
   }
