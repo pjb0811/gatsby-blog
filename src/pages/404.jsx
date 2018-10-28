@@ -6,14 +6,6 @@ import Button from '@material-ui/core/Button'
 import { Link } from 'gatsby'
 
 const styles = theme => ({
-  notFoundRoot: {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '0 20px',
-  },
   notFoundPaper: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing.unit * 2,
@@ -32,7 +24,16 @@ class NotFoundPage extends Component {
     const { classes } = this.props
 
     return (
-      <div className={classes.notFoundRoot}>
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '0 20px',
+        }}
+      >
         <Paper className={classes.notFoundPaper} elevation={1}>
           <Typography variant="h3" className={classes.notFoundTitle}>
             Page not found :(

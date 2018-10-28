@@ -23,15 +23,6 @@ const styles = theme => ({
       width: 960,
     },
   },
-  blogPostContainer: {
-    width: '100%',
-    margin: 0,
-  },
-  blogPostChips: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    flexWrap: 'wrap',
-  },
   blogPostChip: {
     margin: theme.spacing.unit,
   },
@@ -66,14 +57,27 @@ class BlogPost extends React.Component {
           alt={`${post.frontmatter.title || siteTitle}`}
         />
         <div className={classes.blogPostRoot}>
-          <Grid container spacing={24} className={classes.blogPostContainer}>
+          <Grid
+            container
+            spacing={24}
+            style={{
+              width: '100%',
+              margin: 0,
+            }}
+          >
             <Grid item xs={12}>
               <Paper className={classes.blogPostPaper} elevation={1}>
                 <PageTitle
                   title={post.frontmatter.title}
                   subTitle={post.frontmatter.date}
                 />
-                <div className={classes.blogPostChips}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                    flexWrap: 'wrap',
+                  }}
+                >
                   {post.frontmatter.tags.map((tag, i) => (
                     <Chip
                       key={i}

@@ -16,9 +16,6 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  sideList: {
-    width: 250,
-  },
 })
 
 class SideList extends Component {
@@ -26,7 +23,7 @@ class SideList extends Component {
     const { classes } = this.props
 
     return (
-      <div className={classes.sideList}>
+      <div style={{ width: 250 }}>
         <div className={classes.sideHeader}>
           <Typography variant="h6" color="inherit" component={Link} to="/">
             pjb0811.github.io

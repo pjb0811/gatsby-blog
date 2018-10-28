@@ -1,19 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import Typography from '@material-ui/core/Typography'
-import { withStyles } from '@material-ui/core/styles'
-
-const styles = theme => ({
-  pageTitleMain: {
-    marginBottom: 20,
-  },
-})
 
 class PageTitle extends Component {
   render() {
-    const { classes, title, subTitle } = this.props
+    const { title, subTitle } = this.props
     return (
       <Fragment>
-        <Typography variant="h3" className={classes.pageTitleMain}>
+        <Typography variant="h3" style={{ marginBottom: 20 }}>
           {title}
         </Typography>
         <Typography variant="subtitle1" align="right">
@@ -24,4 +17,4 @@ class PageTitle extends Component {
   }
 }
 
-export default withStyles(styles)(PageTitle)
+export default PageTitle

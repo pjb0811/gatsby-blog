@@ -25,9 +25,6 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
   },
-  tagListTitle: {
-    marginBottom: 20,
-  },
 })
 
 class TagList extends Component {
@@ -36,7 +33,12 @@ class TagList extends Component {
     return (
       <div className={classes.tagListRoot}>
         <Paper className={classes.tagListPaper} elevation={1}>
-          <Typography variant="h3" className={classes.tagListTitle}>
+          <Typography
+            variant="h3"
+            style={{
+              marginBottom: 20,
+            }}
+          >
             Tags
           </Typography>
           <List component="nav">

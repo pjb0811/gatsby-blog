@@ -30,10 +30,6 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
   },
-  tagsList: {
-    width: '100%',
-    margin: 0,
-  },
 })
 
 class Tags extends Component {
@@ -55,7 +51,14 @@ class Tags extends Component {
         <div className={classes.tagsRoot}>
           <Paper className={classes.tagsPaper} elevation={1}>
             <PageTitle title={tag} subTitle={`${totalCount}개의 글`} />
-            <Grid container spacing={24} className={classes.tagsList}>
+            <Grid
+              container
+              spacing={24}
+              style={{
+                width: '100%',
+                margin: 0,
+              }}
+            >
               {edges.map(({ node }) => (
                 <PostCard key={node.fields.slug} node={node} />
               ))}

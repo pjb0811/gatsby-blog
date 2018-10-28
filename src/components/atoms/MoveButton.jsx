@@ -12,9 +12,6 @@ const styles = theme => ({
   moveRightIcon: {
     marginLeft: theme.spacing.unit,
   },
-  moveButtonText: {
-    width: 100,
-  },
 })
 
 class Move extends Component {
@@ -38,7 +35,9 @@ class Move extends Component {
           variant="button"
           color="inherit"
           noWrap={true}
-          className={classes.moveButtonText}
+          style={{
+            width: 100
+          }}
         >
           {direction.frontmatter.title}
         </Typography>

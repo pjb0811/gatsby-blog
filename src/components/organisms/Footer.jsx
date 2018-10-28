@@ -11,19 +11,6 @@ const styles = theme => ({
     padding: 20,
     background: theme.palette.secondary.main,
   },
-  footerIcons: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  footerText: {
-    textAlign: 'center',
-  },
-  footerGatsbyImage: {
-    width: 24,
-    height: 24,
-    verticalAlign: 'middle',
-    marginLeft: 10,
-  },
 })
 
 class Footer extends Component {
@@ -32,14 +19,15 @@ class Footer extends Component {
     return (
       <div className={classes.footerRoot}>
         <Grid item xs={12}>
-          <Typography
-            variant="subtitle2"
-            color="inherit"
-            className={classes.text}
-          >
+          <Typography variant="subtitle2" color="inherit" align="center">
             Copyright © 2018. pjb0811 All rights reserved.
           </Typography>
-          <div className={classes.footerIcons}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
             <IconButton color="inherit">
               <a href="https://github.com/pjb0811" className="icon">
                 <Icon className={'fab fa-github'} fontSize="small" />
@@ -56,17 +44,18 @@ class Footer extends Component {
               </a>
             </IconButton>
           </div>
-          <Typography
-            variant="subtitle2"
-            color="inherit"
-            className={classes.footerText}
-          >
+          <Typography variant="subtitle2" color="inherit" align="center">
             Powered by{' '}
             <a href="https://www.gatsbyjs.org/">
               <img
                 src={gatsbyIcon}
-                className={classes.footerGatsbyImage}
                 alt="gatsby"
+                style={{
+                  width: 24,
+                  height: 24,
+                  verticalAlign: 'middle',
+                  marginLeft: 10,
+                }}
               />
             </a>
           </Typography>
