@@ -16,8 +16,6 @@ import PageTitle from '../molecules/PageTitle'
 
 const styles = theme => ({
   tagsRoot: {
-    margin: '20px auto',
-    width: '100%',
     [theme.breakpoints.up('sm')]: {
       width: 600,
     },
@@ -48,7 +46,12 @@ class Tags extends Component {
     return (
       <Layout location={this.props.location}>
         <ImageCover img={images[tag] || tagImage} alt={tag} />
-        <div className={classes.tagsRoot}>
+        <div
+          className={classes.tagsRoot}
+          style={{
+            margin: '20px auto',
+          }}
+        >
           <Paper className={classes.tagsPaper} elevation={1}>
             <PageTitle title={tag} subTitle={`${totalCount}개의 글`} />
             <Grid

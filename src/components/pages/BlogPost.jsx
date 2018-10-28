@@ -14,8 +14,6 @@ import PageTitle from '../molecules/PageTitle'
 
 const styles = theme => ({
   blogPostRoot: {
-    margin: '20px auto',
-    width: '100%',
     [theme.breakpoints.up('sm')]: {
       width: 600,
     },
@@ -56,7 +54,12 @@ class BlogPost extends React.Component {
           img={post.frontmatter.mainImage.childImageSharp.sizes.src}
           alt={`${post.frontmatter.title || siteTitle}`}
         />
-        <div className={classes.blogPostRoot}>
+        <div
+          className={classes.blogPostRoot}
+          style={{
+            margin: '20px auto',
+          }}
+        >
           <Grid
             container
             spacing={24}

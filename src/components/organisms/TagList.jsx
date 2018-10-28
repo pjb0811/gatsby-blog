@@ -11,8 +11,6 @@ import Badge from '@material-ui/core/Badge'
 
 const styles = theme => ({
   tagListRoot: {
-    margin: '20px auto',
-    width: '100%',
     [theme.breakpoints.up('sm')]: {
       width: 600,
     },
@@ -31,7 +29,12 @@ class TagList extends Component {
   render() {
     const { group, classes } = this.props
     return (
-      <div className={classes.tagListRoot}>
+      <div
+        className={classes.tagListRoot}
+        style={{
+          margin: '20px auto',
+        }}
+      >
         <Paper className={classes.tagListPaper} elevation={1}>
           <Typography
             variant="h3"
