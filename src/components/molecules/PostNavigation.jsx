@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid'
 import { withStyles } from '@material-ui/core/styles'
 
 const styles = theme => ({
-  nav: {
+  postNav: {
     padding: 20,
   },
 })
@@ -19,7 +19,7 @@ class PostNavigation extends Component {
         direction="row"
         justify="space-around"
         alignItems="center"
-        className={classes.nav}
+        className={classes.postNav}
       >
         <MoveButton direction={previous} rel="prev" />
         <MoveButton direction={next} rel="next" />

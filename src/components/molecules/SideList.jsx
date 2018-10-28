@@ -10,17 +10,14 @@ import Icon from '@material-ui/core/Icon'
 import { Link } from 'gatsby'
 
 const styles = theme => ({
-  toolbar: {
+  sideHeader: {
     ...theme.mixins.toolbar,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  list: {
+  sideList: {
     width: 250,
-  },
-  fullList: {
-    width: 'auto',
   },
 })
 
@@ -29,15 +26,9 @@ class SideList extends Component {
     const { classes } = this.props
 
     return (
-      <div className={classes.list}>
-        <div className={classes.toolbar}>
-          <Typography
-            variant="h6"
-            color="inherit"
-            className={classes.title}
-            component={Link}
-            to="/"
-          >
+      <div className={classes.sideList}>
+        <div className={classes.sideHeader}>
+          <Typography variant="h6" color="inherit" component={Link} to="/">
             pjb0811.github.io
           </Typography>
         </div>

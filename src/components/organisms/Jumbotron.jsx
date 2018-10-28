@@ -3,17 +3,17 @@ import { withStyles } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
 
 const styles = theme => ({
-  root: {
+  jumbotronRoot: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     height: 300,
   },
-  text: {
+  jumbotronText: {
     color: '#fff',
     fontWeight: 500,
   },
-  subtitle: {
+  jumbotronSubTitle: {
     marginTop: 20,
   },
 })
@@ -23,14 +23,18 @@ class Jumbotron extends Component {
     const { classes } = this.props
 
     return (
-      <div className={classes.root}>
-        <Typography variant="h3" align="center" className={classes.text}>
+      <div className={classes.jumbotronRoot}>
+        <Typography
+          variant="h3"
+          align="center"
+          className={classes.jumbotronText}
+        >
           Welcome to my blog!
         </Typography>
         <Typography
-          variant="subtitle1"
+          variant="jumbotronSubTitle1"
           align="center"
-          className={`${classes.text} ${classes.subtitle}`}
+          className={`${classes.jumbotronText} ${classes.jumbotronSubTitle}`}
         >
           Introduce React, TypeScript, and JavaScript related postings.
         </Typography>

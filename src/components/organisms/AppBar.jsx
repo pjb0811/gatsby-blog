@@ -12,21 +12,21 @@ import Drawer from '@material-ui/core/Drawer'
 import SideList from '../molecules/SideList'
 
 const styles = theme => ({
-  root: {
+  appBarRoot: {
     width: '100%',
   },
-  grow: {
+  appBarGrow: {
     flexGrow: 1,
   },
-  menuButton: {
+  appBarMenuButton: {
     marginLeft: -12,
     marginRight: 20,
   },
-  toolbar: {
+  appBarSpace: {
     ...theme.mixins.toolbar,
     marginBottom: 10,
   },
-  title: {
+  appBarTitle: {
     display: 'none',
     [theme.breakpoints.up('sm')]: {
       display: 'block',
@@ -65,11 +65,11 @@ class ButtonAppBar extends Component {
             <SideList />
           </div>
         </Drawer>
-        <div className={classes.root}>
+        <div className={classes.appBarRoot}>
           <AppBar position="fixed">
             <Toolbar>
               <IconButton
-                className={classes.menuButton}
+                className={classes.appBarMenuButton}
                 color="inherit"
                 aria-label="Menu"
                 onClick={this.toggleDrawer(true)}
@@ -79,19 +79,19 @@ class ButtonAppBar extends Component {
               <Typography
                 variant="h6"
                 color="inherit"
-                className={classes.title}
+                className={classes.appBarTitle}
                 component={Link}
                 to={'/'}
               >
                 pjb0811.github.io
               </Typography>
-              <div className={classes.grow} />
+              <div className={classes.appBarGrow} />
               <SearchBox />
               <AppMenu />
             </Toolbar>
           </AppBar>
         </div>
-        <div className={classes.toolbar} />
+        <div className={classes.appBarSpace} />
       </Fragment>
     )
   }

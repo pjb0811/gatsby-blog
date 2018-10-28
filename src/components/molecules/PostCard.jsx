@@ -11,8 +11,7 @@ import CardMedia from '@material-ui/core/CardMedia'
 import Button from '@material-ui/core/Button'
 
 const styles = {
-  card: {},
-  media: {
+  postCardMedia: {
     height: 140,
   },
 }
@@ -24,10 +23,10 @@ class PostCard extends Component {
 
     return (
       <Grid item xs={12}>
-        <Card className={classes.card}>
+        <Card>
           <CardActionArea component={Link} to={node.fields.slug}>
             <CardMedia
-              className={classes.media}
+              className={classes.postCardMedia}
               image={mainImage.childImageSharp.sizes.src}
               title={title || node.fields.slug}
             />

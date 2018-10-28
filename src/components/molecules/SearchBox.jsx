@@ -29,11 +29,11 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  inputRoot: {
+  searchInputRoot: {
     color: 'inherit',
     width: '100%',
   },
-  inputInput: {
+  searchInput: {
     paddingTop: theme.spacing.unit,
     paddingRight: theme.spacing.unit,
     paddingBottom: theme.spacing.unit,
@@ -58,8 +58,8 @@ class SearchBox extends Component {
         <InputBase
           placeholder="Search…"
           classes={{
-            root: classes.inputRoot,
-            input: classes.inputInput,
+            root: classes.searchInputRoot,
+            input: classes.searchInput,
           }}
         />
       </div>

@@ -3,7 +3,6 @@ import { graphql } from 'gatsby'
 import { withStyles } from '@material-ui/core/styles'
 import Layout from '../templates/Layout'
 import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
 import ImageCover from '../organisms/ImageCover'
 import tagImage from '../../assets/tags.jpg'
 import jsImage from '../../assets/javascript.png'
@@ -13,9 +12,10 @@ import reactImage from '../../assets/react.png'
 import tsImage from '../../assets/typescript.jpg'
 import PostCard from '../molecules/PostCard'
 import Grid from '@material-ui/core/Grid'
+import PageTitle from '../molecules/PageTitle'
 
 const styles = theme => ({
-  root: {
+  tagsRoot: {
     margin: '20px auto',
     width: '100%',
     [theme.breakpoints.up('sm')]: {
@@ -25,15 +25,12 @@ const styles = theme => ({
       width: 960,
     },
   },
-  paper: {
+  tagsPaper: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
   },
-  title: {
-    marginBottom: 20,
-  },
-  list: {
+  tagsList: {
     width: '100%',
     margin: 0,
   },
@@ -55,16 +52,10 @@ class Tags extends Component {
     return (
       <Layout location={this.props.location}>
         <ImageCover img={images[tag] || tagImage} alt={tag} />
-        <div className={classes.root}>
-          <Paper className={classes.paper} elevation={1}>
-            <Typography variant="h3" className={classes.title}>
-              {tag}
-            </Typography>
-            <Typography variant="subtitle1" className={classes.title}>
-              {totalCount}
-              개의 글
-            </Typography>
-            <Grid container spacing={24} className={classes.list}>
+        <div className={classes.tagsRoot}>
+          <Paper className={classes.tagsPaper} elevation={1}>
+            <PageTitle title={tag} subTitle={`${totalCount}개의 글`} />
+            <Grid container spacing={24} className={classes.tagsList}>
               {edges.map(({ node }) => (
                 <PostCard key={node.fields.slug} node={node} />
               ))}

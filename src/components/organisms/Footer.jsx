@@ -7,18 +7,18 @@ import IconButton from '@material-ui/core/IconButton'
 import Icon from '@material-ui/core/Icon'
 
 const styles = theme => ({
-  root: {
+  footerRoot: {
     padding: 20,
     background: theme.palette.secondary.main,
   },
-  icons: {
+  footerIcons: {
     display: 'flex',
     justifyContent: 'center',
   },
-  text: {
+  footerText: {
     textAlign: 'center',
   },
-  gatsby: {
+  footerGatsbyImage: {
     width: 24,
     height: 24,
     verticalAlign: 'middle',
@@ -30,7 +30,7 @@ class Footer extends Component {
   render() {
     const { classes } = this.props
     return (
-      <div className={classes.root}>
+      <div className={classes.footerRoot}>
         <Grid item xs={12}>
           <Typography
             variant="subtitle2"
@@ -39,7 +39,7 @@ class Footer extends Component {
           >
             Copyright © 2018. pjb0811 All rights reserved.
           </Typography>
-          <div className={classes.icons}>
+          <div className={classes.footerIcons}>
             <IconButton color="inherit">
               <a href="https://github.com/pjb0811" className="icon">
                 <Icon className={'fab fa-github'} fontSize="small" />
@@ -59,11 +59,15 @@ class Footer extends Component {
           <Typography
             variant="subtitle2"
             color="inherit"
-            className={classes.text}
+            className={classes.footerText}
           >
             Powered by{' '}
             <a href="https://www.gatsbyjs.org/">
-              <img src={gatsbyIcon} className={classes.gatsby} alt="gatsby" />
+              <img
+                src={gatsbyIcon}
+                className={classes.footerGatsbyImage}
+                alt="gatsby"
+              />
             </a>
           </Typography>
         </Grid>

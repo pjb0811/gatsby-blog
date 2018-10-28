@@ -5,15 +5,15 @@ import get from 'lodash/get'
 import Layout from '../templates/Layout'
 import Grid from '@material-ui/core/Grid'
 import { withStyles } from '@material-ui/core/styles'
-import Typography from '@material-ui/core/Typography'
 import PostNavigation from '../molecules/PostNavigation'
 import { DiscussionEmbed } from 'disqus-react'
 import Paper from '@material-ui/core/Paper'
 import Chip from '@material-ui/core/Chip'
 import ImageCover from '../organisms/ImageCover'
+import PageTitle from '../molecules/PageTitle'
 
 const styles = theme => ({
-  root: {
+  blogPostRoot: {
     margin: '20px auto',
     width: '100%',
     [theme.breakpoints.up('sm')]: {
@@ -23,19 +23,19 @@ const styles = theme => ({
       width: 960,
     },
   },
-  post: {
+  blogPostContainer: {
     width: '100%',
     margin: 0,
   },
-  chips: {
+  blogPostChips: {
     display: 'flex',
     justifyContent: 'flex-start',
     flexWrap: 'wrap',
   },
-  chip: {
+  blogPostChip: {
     margin: theme.spacing.unit,
   },
-  paper: {
+  blogPostPaper: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
@@ -65,21 +65,21 @@ class BlogPost extends React.Component {
           img={post.frontmatter.mainImage.childImageSharp.sizes.src}
           alt={`${post.frontmatter.title || siteTitle}`}
         />
-        <div className={classes.root}>
-          <Grid container spacing={24} className={classes.post}>
+        <div className={classes.blogPostRoot}>
+          <Grid container spacing={24} className={classes.blogPostContainer}>
             <Grid item xs={12}>
-              <Paper className={classes.paper} elevation={1}>
-                <Typography variant="h3">{post.frontmatter.title}</Typography>
-                <Typography variant="subtitle1" align="right">
-                  {post.frontmatter.date}
-                </Typography>
-                <div className={classes.chips}>
+              <Paper className={classes.blogPostPaper} elevation={1}>
+                <PageTitle
+                  title={post.frontmatter.title}
+                  subTitle={post.frontmatter.date}
+                />
+                <div className={classes.blogPostChips}>
                   {post.frontmatter.tags.map((tag, i) => (
                     <Chip
                       key={i}
                       color="secondary"
                       label={tag}
-                      className={classes.chip}
+                      className={classes.blogPostChip}
                     />
                   ))}
                 </div>
@@ -87,7 +87,7 @@ class BlogPost extends React.Component {
               </Paper>
             </Grid>
             <Grid item xs={12}>
-              <Paper className={classes.paper} elevation={1}>
+              <Paper className={classes.blogPostPaper} elevation={1}>
                 <DiscussionEmbed
                   shortname={disqusShortname}
                   config={disqusConfig}

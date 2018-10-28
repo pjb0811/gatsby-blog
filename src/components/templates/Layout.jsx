@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react'
 import AppBar from '../organisms/AppBar'
 // import { loadCSS } from 'fg-loadcss/src/loadCSS'
-// import { withStyles } from '@material-ui/core/styles'
 import Footer from '../organisms/Footer'
 import 'typeface-roboto'
 import withRoot from './withRoot'

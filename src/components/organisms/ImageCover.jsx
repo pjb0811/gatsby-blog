@@ -2,15 +2,15 @@ import React, { Component, Fragment } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 
 const styles = theme => ({
-  root: {
+  imageCoverRoot: {
     position: 'absolute',
     width: '100%',
     height: 400,
   },
-  space: {
+  imageCoverSpace: {
     height: 300,
   },
-  img: {
+  imageCoverImg: {
     zIndex: -1,
     position: 'absolute',
     top: 0,
@@ -28,11 +28,11 @@ class ImageCover extends Component {
 
     return (
       <Fragment>
-        <div className={classes.root}>
-          <img src={img} className={classes.img} alt={alt} />
+        <div className={classes.imageCoverRoot}>
+          <img src={img} className={classes.imageCoverImg} alt={alt} />
           {children}
         </div>
-        <div className={classes.space} />
+        <div className={classes.imageCoverSpace} />
       </Fragment>
     )
   }

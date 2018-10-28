@@ -10,7 +10,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 import Badge from '@material-ui/core/Badge'
 
 const styles = theme => ({
-  root: {
+  tagListRoot: {
     margin: '20px auto',
     width: '100%',
     [theme.breakpoints.up('sm')]: {
@@ -20,16 +20,13 @@ const styles = theme => ({
       width: 960,
     },
   },
-  paper: {
+  tagListPaper: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
   },
-  title: {
+  tagListTitle: {
     marginBottom: 20,
-  },
-  badge: {
-    margin: theme.spacing.unit * 2,
   },
 })
 
@@ -37,9 +34,9 @@ class TagList extends Component {
   render() {
     const { group, classes } = this.props
     return (
-      <div className={classes.root}>
-        <Paper className={classes.paper} elevation={1}>
-          <Typography variant="h3" className={classes.title}>
+      <div className={classes.tagListRoot}>
+        <Paper className={classes.tagListPaper} elevation={1}>
+          <Typography variant="h3" className={classes.tagListTitle}>
             Tags
           </Typography>
           <List component="nav">
