@@ -5,7 +5,7 @@ import ImageCover from '../organisms/ImageCover'
 import PostList from '../organisms/PostList'
 import { navigate } from 'gatsby-link'
 import Paginate from '../organisms/Paginate'
-import jsImage from '../../assets/javascript.jpg'
+import mainImage from '../../assets/main.jpg'
 import Jumbotron from '../organisms/Jumbotron'
 
 class Index extends Component {
@@ -32,7 +32,7 @@ class Index extends Component {
           ]}
           title={siteMetadata.title}
         />
-        <ImageCover img={jsImage} alt="javascript">
+        <ImageCover img={mainImage} alt="javascript">
           <Jumbotron />
         </ImageCover>
         <PostList posts={group} />

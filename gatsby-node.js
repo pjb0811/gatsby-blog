@@ -1,5 +1,6 @@
 const Promise = require('bluebird')
 const path = require('path')
+const _ = require('lodash')
 const { createFilePath } = require('gatsby-source-filesystem')
 const createPaginatedPages = require('gatsby-paginate')
 
@@ -8,6 +9,7 @@ exports.createPages = ({ graphql, actions }) => {
 
   return new Promise((resolve, reject) => {
     const BlogPost = path.resolve('./src/components/pages/BlogPost.jsx')
+    const Tags = path.resolve('src/components/pages/Tags.jsx')
 
     resolve(
       graphql(
@@ -84,6 +86,28 @@ exports.createPages = ({ graphql, actions }) => {
               slug: node.fields.slug,
               previous,
               next,
+            },
+          })
+        })
+
+        // Tag pages:
+        let tags = []
+        // Iterate through each post, putting all found tags into `tags`
+        _.each(posts, edge => {
+          if (_.get(edge, 'node.frontmatter.tags')) {
+            tags = tags.concat(edge.node.frontmatter.tags)
+          }
+        })
+        // Eliminate duplicate tags
+        tags = _.uniq(tags)
+
+        // Make tag pages
+        tags.forEach(tag => {
+          createPage({
+            path: `/tags/${_.kebabCase(tag)}/`,
+            component: Tags,
+            context: {
+              tag,
             },
           })
         })
