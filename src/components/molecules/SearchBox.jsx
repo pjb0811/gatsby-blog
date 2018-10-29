@@ -4,6 +4,13 @@ import { fade } from '@material-ui/core/styles/colorManipulator'
 import SearchIcon from '@material-ui/icons/Search'
 import InputBase from '@material-ui/core/InputBase'
 
+import ClickAwayListener from '@material-ui/core/ClickAwayListener'
+import Grow from '@material-ui/core/Grow'
+import Paper from '@material-ui/core/Paper'
+import Popper from '@material-ui/core/Popper'
+import MenuItem from '@material-ui/core/MenuItem'
+import MenuList from '@material-ui/core/MenuList'
+
 const styles = theme => ({
   search: {
     position: 'relative',
@@ -44,11 +51,33 @@ const styles = theme => ({
       width: 200,
     },
   },
+  popper: {
+    marginTop: 10,
+    width: '100%',
+  },
 })
 
 class SearchBox extends Component {
+  state = {
+    open: false,
+  }
+
+  handleToggle = event => {
+    const open = !!event.target.value
+    this.setState(state => ({ open }))
+  }
+
+  handleClose = event => {
+    if (this.anchorEl.contains(event.target)) {
+      return
+    }
+
+    this.setState({ open: false })
+  }
+
   render() {
     const { classes } = this.props
+    const { open } = this.state
 
     return (
       <div className={classes.search}>
@@ -61,7 +90,39 @@ class SearchBox extends Component {
             root: classes.searchInputRoot,
             input: classes.searchInput,
           }}
+          inputRef={node => {
+            this.anchorEl = node
+          }}
+          onChange={this.handleToggle}
         />
+        <Popper
+          open={open}
+          anchorEl={this.anchorEl}
+          transition
+          disablePortal
+          className={classes.popper}
+        >
+          {({ TransitionProps, placement }) => (
+            <Grow
+              {...TransitionProps}
+              id="menu-list-grow"
+              style={{
+                transformOrigin:
+                  placement === 'bottom' ? 'center top' : 'center bottom',
+              }}
+            >
+              <Paper>
+                <ClickAwayListener onClickAway={this.handleClose}>
+                  <MenuList>
+                    <MenuItem onClick={this.handleClose}>Profile</MenuItem>
+                    <MenuItem onClick={this.handleClose}>My account</MenuItem>
+                    <MenuItem onClick={this.handleClose}>Logout</MenuItem>
+                  </MenuList>
+                </ClickAwayListener>
+              </Paper>
+            </Grow>
+          )}
+        </Popper>
       </div>
     )
   }
