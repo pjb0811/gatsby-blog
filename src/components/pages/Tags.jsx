@@ -54,14 +54,18 @@ class Tags extends Component {
         <Helmet title={`tags - ${tag}`} />
         <ImageCover img={images[tag] || tagImage} alt={tag} />
         <div className={classes.root}>
-          <Paper className={classes.paper} elevation={1}>
-            <PageTitle title={tag} subTitle={`${totalCount}개의 글`} />
-            <Grid container spacing={24} className={classes.container}>
-              {edges.map(({ node }) => (
-                <PostCard key={node.fields.slug} node={node} />
-              ))}
+          <Grid container spacing={24} className={classes.container}>
+            <Grid item xs={12} spacing={24}>
+              <Paper className={classes.paper} elevation={1}>
+                <PageTitle title={tag} subTitle={`${totalCount}개의 글`} />
+                <Grid container spacing={24}>
+                  {edges.map(({ node }) => (
+                    <PostCard key={node.fields.slug} node={node} />
+                  ))}
+                </Grid>
+              </Paper>
             </Grid>
-          </Paper>
+          </Grid>
         </div>
       </Layout>
     )

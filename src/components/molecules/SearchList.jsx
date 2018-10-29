@@ -65,7 +65,7 @@ class SearchList extends Component {
                         primary={
                           <Typography
                             variant="button"
-                            color="inherit"
+                            color="textPrimary"
                             noWrap={true}
                           >
                             {result.title}
