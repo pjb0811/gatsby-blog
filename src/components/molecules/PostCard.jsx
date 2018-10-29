@@ -8,10 +8,17 @@ import CardActions from '@material-ui/core/CardActions'
 import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 import Button from '@material-ui/core/Button'
+import { withStyles } from '@material-ui/core/styles'
+
+const styles = theme => ({
+  cardMedia: {
+    height: 140,
+  },
+})
 
 class PostCard extends Component {
   render() {
-    const { node } = this.props
+    const { node, classes } = this.props
     const { title, mainImage, tags } = node.frontmatter
 
     return (
@@ -21,9 +28,7 @@ class PostCard extends Component {
             <CardMedia
               image={mainImage.childImageSharp.sizes.src}
               title={title || node.fields.slug}
-              style={{
-                height: 140,
-              }}
+              className={classes.cardMedia}
             />
             <CardContent>
               <Typography gutterBottom variant="h5" component="h2">
@@ -45,4 +50,4 @@ class PostCard extends Component {
   }
 }
 
-export default PostCard
+export default withStyles(styles, { name: 'postCard' })(PostCard)

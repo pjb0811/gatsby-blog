@@ -7,7 +7,7 @@ import IconButton from '@material-ui/core/IconButton'
 import Icon from '@material-ui/core/Icon'
 
 const styles = theme => ({
-  footerRoot: {
+  root: {
     padding: 20,
     background: theme.palette.secondary.main,
   },
@@ -17,7 +17,7 @@ class Footer extends Component {
   render() {
     const { classes } = this.props
     return (
-      <div className={classes.footerRoot}>
+      <div className={classes.root}>
         <Grid item xs={12}>
           <Typography variant="subtitle2" color="inherit" align="center">
             Copyright © 2018. pjb0811 All rights reserved.
@@ -65,4 +65,4 @@ class Footer extends Component {
   }
 }
 
-export default withStyles(styles)(Footer)
+export default withStyles(styles, { name: 'footer' })(Footer)

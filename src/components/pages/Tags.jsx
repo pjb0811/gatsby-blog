@@ -15,7 +15,7 @@ import Grid from '@material-ui/core/Grid'
 import PageTitle from '../molecules/PageTitle'
 
 const styles = theme => ({
-  tagsRoot: {
+  root: {
     [theme.breakpoints.up('sm')]: {
       width: 600,
     },
@@ -23,7 +23,7 @@ const styles = theme => ({
       width: 960,
     },
   },
-  tagsPaper: {
+  paper: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
@@ -47,12 +47,12 @@ class Tags extends Component {
       <Layout location={this.props.location}>
         <ImageCover img={images[tag] || tagImage} alt={tag} />
         <div
-          className={classes.tagsRoot}
+          className={classes.root}
           style={{
             margin: '20px auto',
           }}
         >
-          <Paper className={classes.tagsPaper} elevation={1}>
+          <Paper className={classes.paper} elevation={1}>
             <PageTitle title={tag} subTitle={`${totalCount}개의 글`} />
             <Grid
               container
@@ -73,7 +73,7 @@ class Tags extends Component {
   }
 }
 
-export default withStyles(styles)(Tags)
+export default withStyles(styles, { name: 'tags' })(Tags)
 
 export const pageQuery = graphql`
   query($tag: String) {

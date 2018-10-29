@@ -4,20 +4,20 @@ import Icon from '@material-ui/core/Icon'
 import { withStyles } from '@material-ui/core/styles'
 
 const styles = theme => ({
-  paginateContainer: {
+  container: {
     display: 'flex',
     margin: '20px 0',
     listStyle: 'none',
     justifyContent: 'center',
   },
-  paginateList: {
+  list: {
     margin: 0,
     width: 36,
     height: 36,
     display: 'flex',
     alignItems: 'center',
   },
-  paginateLink: {
+  link: {
     ...theme.typography.button,
     ...theme.palette.action,
     color: 'inherit',
@@ -28,13 +28,13 @@ const styles = theme => ({
     height: '100%',
     cursor: 'pointer',
   },
-  paginateIcon: {
+  icon: {
     color: theme.palette.primary.light,
     display: 'flex !important',
     justifyContent: 'center',
     cursor: 'pointer',
   },
-  paginateActive: {
+  active: {
     background: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
     borderRadius: '50%',
@@ -50,32 +50,32 @@ class Paginate extends Component {
       <ReactPaginate
         previousLabel={
           <Icon
-            className={`fas fa-caret-left ${classes.paginateIcon}`}
+            className={`fas fa-caret-left ${classes.icon}`}
             fontSize="large"
           />
         }
         nextLabel={
           <Icon
-            className={`fas fa-caret-right ${classes.paginateIcon}`}
+            className={`fas fa-caret-right ${classes.icon}`}
             fontSize="large"
           />
         }
-        previousClassName={classes.paginateList}
-        nextClassName={classes.paginateList}
-        pageClassName={classes.paginateList}
-        previousLinkClassName={classes.paginateLink}
-        nextLinkClassName={classes.paginateLink}
-        pageLinkClassName={classes.paginateLink}
+        previousClassName={classes.list}
+        nextClassName={classes.list}
+        pageClassName={classes.list}
+        previousLinkClassName={classes.link}
+        nextLinkClassName={classes.link}
+        pageLinkClassName={classes.link}
         forcePage={index - 1}
         pageCount={pageCount}
         marginPagesDisplayed={1}
         pageRangeDisplayed={5}
         onPageChange={onPageChange}
-        containerClassName={classes.paginateContainer}
-        activeClassName={classes.paginateActive}
+        containerClassName={classes.container}
+        activeClassName={classes.active}
       />
     )
   }
 }
 
-export default withStyles(styles)(Paginate)
+export default withStyles(styles, { name: 'paginate' })(Paginate)

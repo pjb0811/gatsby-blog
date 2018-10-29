@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles'
 import PostCard from '../molecules/PostCard'
 
 const styles = theme => ({
-  postListRoot: {
+  root: {
     margin: '0 auto',
     width: '100%',
     [theme.breakpoints.up('sm')]: {
@@ -21,7 +21,7 @@ class PostList extends Component {
     const { posts, classes } = this.props
 
     return (
-      <div className={classes.postListRoot}>
+      <div className={classes.root}>
         <Grid
           container
           spacing={24}
@@ -39,4 +39,4 @@ class PostList extends Component {
   }
 }
 
-export default withStyles(styles)(PostList)
+export default withStyles(styles, { name: 'postList' })(PostList)

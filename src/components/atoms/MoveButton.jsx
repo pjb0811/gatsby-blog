@@ -6,11 +6,14 @@ import Icon from '@material-ui/core/Icon'
 import Typography from '@material-ui/core/Typography'
 
 const styles = theme => ({
-  moveLeftIcon: {
+  leftIcon: {
     marginRight: theme.spacing.unit,
   },
-  moveRightIcon: {
+  rightIcon: {
     marginLeft: theme.spacing.unit,
+  },
+  text: {
+    width: 100,
   },
 })
 
@@ -29,24 +32,22 @@ class Move extends Component {
         to={direction.fields.slug}
       >
         {rel === 'prev' && (
-          <Icon className={`fas fa-arrow-left ${classes.moveLeftIcon}`} />
+          <Icon className={`fas fa-arrow-left ${classes.leftIcon}`} />
         )}
         <Typography
           variant="button"
           color="inherit"
           noWrap={true}
-          style={{
-            width: 100
-          }}
+          className={classes.text}
         >
           {direction.frontmatter.title}
         </Typography>
         {rel === 'next' && (
-          <Icon className={`fas fa-arrow-right ${classes.moveRightIcon}`} />
+          <Icon className={`fas fa-arrow-right ${classes.rightIcon}`} />
         )}
       </Button>
     )
   }
 }
 
-export default withStyles(styles)(Move)
+export default withStyles(styles, { name: 'moveButton' })(Move)

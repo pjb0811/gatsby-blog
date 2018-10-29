@@ -13,7 +13,7 @@ import ImageCover from '../organisms/ImageCover'
 import PageTitle from '../molecules/PageTitle'
 
 const styles = theme => ({
-  blogPostRoot: {
+  root: {
     [theme.breakpoints.up('sm')]: {
       width: 600,
     },
@@ -21,10 +21,10 @@ const styles = theme => ({
       width: 960,
     },
   },
-  blogPostChip: {
+  chip: {
     margin: theme.spacing.unit,
   },
-  blogPostPaper: {
+  paper: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
@@ -55,7 +55,7 @@ class BlogPost extends React.Component {
           alt={`${post.frontmatter.title || siteTitle}`}
         />
         <div
-          className={classes.blogPostRoot}
+          className={classes.root}
           style={{
             margin: '20px auto',
           }}
@@ -69,7 +69,7 @@ class BlogPost extends React.Component {
             }}
           >
             <Grid item xs={12}>
-              <Paper className={classes.blogPostPaper} elevation={1}>
+              <Paper className={classes.paper} elevation={1}>
                 <PageTitle
                   title={post.frontmatter.title}
                   subTitle={post.frontmatter.date}
@@ -86,7 +86,7 @@ class BlogPost extends React.Component {
                       key={i}
                       color="secondary"
                       label={tag}
-                      className={classes.blogPostChip}
+                      className={classes.chip}
                     />
                   ))}
                 </div>
@@ -94,7 +94,7 @@ class BlogPost extends React.Component {
               </Paper>
             </Grid>
             <Grid item xs={12}>
-              <Paper className={classes.blogPostPaper} elevation={1}>
+              <Paper className={classes.paper} elevation={1}>
                 <DiscussionEmbed
                   shortname={disqusShortname}
                   config={disqusConfig}
@@ -109,7 +109,7 @@ class BlogPost extends React.Component {
   }
 }
 
-export default withStyles(styles)(BlogPost)
+export default withStyles(styles, { name: 'blogPost' })(BlogPost)
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {

@@ -12,11 +12,11 @@ import Drawer from '@material-ui/core/Drawer'
 import SideList from '../molecules/SideList'
 
 const styles = theme => ({
-  appBarSpace: {
+  space: {
     ...theme.mixins.toolbar,
     marginBottom: 10,
   },
-  appBarTitle: {
+  title: {
     display: 'none',
     [theme.breakpoints.up('sm')]: {
       display: 'block',
@@ -72,7 +72,7 @@ class ButtonAppBar extends Component {
               <Typography
                 variant="h6"
                 color="inherit"
-                className={classes.appBarTitle}
+                className={classes.title}
                 component={Link}
                 to={'/'}
               >
@@ -84,10 +84,10 @@ class ButtonAppBar extends Component {
             </Toolbar>
           </AppBar>
         </div>
-        <div className={classes.appBarSpace} />
+        <div className={classes.space} />
       </Fragment>
     )
   }
 }
 
-export default withStyles(styles)(ButtonAppBar)
+export default withStyles(styles, { name: 'appBar' })(ButtonAppBar)

@@ -10,7 +10,7 @@ import Icon from '@material-ui/core/Icon'
 import { Link } from 'gatsby'
 
 const styles = theme => ({
-  sideHeader: {
+  header: {
     ...theme.mixins.toolbar,
     display: 'flex',
     justifyContent: 'center',
@@ -24,7 +24,7 @@ class SideList extends Component {
 
     return (
       <div style={{ width: 250 }}>
-        <div className={classes.sideHeader}>
+        <div className={classes.header}>
           <Typography variant="h6" color="inherit" component={Link} to="/">
             pjb0811.github.io
           </Typography>
@@ -62,4 +62,4 @@ class SideList extends Component {
   }
 }
 
-export default withStyles(styles)(SideList)
+export default withStyles(styles, { name: 'sideList' })(SideList)

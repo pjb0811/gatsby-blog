@@ -67,4 +67,4 @@ class SearchBox extends Component {
   }
 }
 
-export default withStyles(styles)(SearchBox)
+export default withStyles(styles, { name: 'searchBox' })(SearchBox)

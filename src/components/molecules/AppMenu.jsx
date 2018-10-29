@@ -4,7 +4,7 @@ import Icon from '@material-ui/core/Icon'
 import { withStyles } from '@material-ui/core/styles'
 
 const styles = theme => ({
-  appMenuSectionDesktop: {
+  sectionDesktop: {
     display: 'none',
     [theme.breakpoints.up('sm')]: {
       display: 'flex',
@@ -17,7 +17,7 @@ class AppMenu extends Component {
     const { classes } = this.props
 
     return (
-      <div className={classes.appMenuSectionDesktop}>
+      <div className={classes.sectionDesktop}>
         <IconButton color="inherit">
           <a href="https://github.com/pjb0811" className="icon">
             <Icon className={'fab fa-github'} />
@@ -38,4 +38,4 @@ class AppMenu extends Component {
   }
 }
 
-export default withStyles(styles)(AppMenu)
+export default withStyles(styles, { name: 'appMenu' })(AppMenu)
