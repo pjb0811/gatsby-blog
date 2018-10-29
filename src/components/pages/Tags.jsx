@@ -22,6 +22,11 @@ const styles = theme => ({
     [theme.breakpoints.up('md')]: {
       width: 960,
     },
+    margin: '20px auto',
+  },
+  container: {
+    width: '100%',
+    margin: 0,
   },
   paper: {
     ...theme.mixins.gutters(),
@@ -46,22 +51,10 @@ class Tags extends Component {
     return (
       <Layout location={this.props.location}>
         <ImageCover img={images[tag] || tagImage} alt={tag} />
-        <div
-          className={classes.root}
-          style={{
-            margin: '20px auto',
-          }}
-        >
+        <div className={classes.root}>
           <Paper className={classes.paper} elevation={1}>
             <PageTitle title={tag} subTitle={`${totalCount}개의 글`} />
-            <Grid
-              container
-              spacing={24}
-              style={{
-                width: '100%',
-                margin: 0,
-              }}
-            >
+            <Grid container spacing={24} className={classes.container}>
               {edges.map(({ node }) => (
                 <PostCard key={node.fields.slug} node={node} />
               ))}

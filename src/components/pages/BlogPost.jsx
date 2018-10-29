@@ -20,6 +20,16 @@ const styles = theme => ({
     [theme.breakpoints.up('md')]: {
       width: 960,
     },
+    margin: '20px auto',
+  },
+  container: {
+    width: '100%',
+    margin: 0,
+  },
+  chips: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    flexWrap: 'wrap',
   },
   chip: {
     margin: theme.spacing.unit,
@@ -54,33 +64,15 @@ class BlogPost extends React.Component {
           img={post.frontmatter.mainImage.childImageSharp.sizes.src}
           alt={`${post.frontmatter.title || siteTitle}`}
         />
-        <div
-          className={classes.root}
-          style={{
-            margin: '20px auto',
-          }}
-        >
-          <Grid
-            container
-            spacing={24}
-            style={{
-              width: '100%',
-              margin: 0,
-            }}
-          >
+        <div className={classes.root}>
+          <Grid container spacing={24} className={classes.container}>
             <Grid item xs={12}>
               <Paper className={classes.paper} elevation={1}>
                 <PageTitle
                   title={post.frontmatter.title}
                   subTitle={post.frontmatter.date}
                 />
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'flex-start',
-                    flexWrap: 'wrap',
-                  }}
-                >
+                <div className={classes.chips}>
                   {post.frontmatter.tags.map((tag, i) => (
                     <Chip
                       key={i}

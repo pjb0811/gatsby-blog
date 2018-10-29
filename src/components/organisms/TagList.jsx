@@ -17,6 +17,10 @@ const styles = theme => ({
     [theme.breakpoints.up('md')]: {
       width: 960,
     },
+    margin: '20px auto',
+  },
+  title: {
+    marginBottom: 20,
   },
   paper: {
     ...theme.mixins.gutters(),
@@ -29,19 +33,9 @@ class TagList extends Component {
   render() {
     const { group, classes } = this.props
     return (
-      <div
-        className={classes.root}
-        style={{
-          margin: '20px auto',
-        }}
-      >
+      <div className={classes.root}>
         <Paper className={classes.paper} elevation={1}>
-          <Typography
-            variant="h3"
-            style={{
-              marginBottom: 20,
-            }}
-          >
+          <Typography variant="h3" className={classes.title}>
             Tags
           </Typography>
           <List component="nav">

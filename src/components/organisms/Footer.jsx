@@ -11,6 +11,16 @@ const styles = theme => ({
     padding: 20,
     background: theme.palette.secondary.main,
   },
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  gatsbyImg: {
+    width: 24,
+    height: 24,
+    verticalAlign: 'middle',
+    marginLeft: 10,
+  },
 })
 
 class Footer extends Component {
@@ -22,12 +32,7 @@ class Footer extends Component {
           <Typography variant="subtitle2" color="inherit" align="center">
             Copyright © 2018. pjb0811 All rights reserved.
           </Typography>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
+          <div className={classes.container}>
             <IconButton color="inherit">
               <a href="https://github.com/pjb0811" className="icon">
                 <Icon className={'fab fa-github'} fontSize="small" />
@@ -50,12 +55,7 @@ class Footer extends Component {
               <img
                 src={gatsbyIcon}
                 alt="gatsby"
-                style={{
-                  width: 24,
-                  height: 24,
-                  verticalAlign: 'middle',
-                  marginLeft: 10,
-                }}
+                className={classes.gatsbyImg}
               />
             </a>
           </Typography>

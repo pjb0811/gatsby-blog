@@ -14,6 +14,10 @@ const styles = theme => ({
       width: 960,
     },
   },
+  container: {
+    width: '100%',
+    margin: 0,
+  },
 })
 
 class PostList extends Component {
@@ -22,14 +26,7 @@ class PostList extends Component {
 
     return (
       <div className={classes.root}>
-        <Grid
-          container
-          spacing={24}
-          style={{
-            width: '100%',
-            margin: 0,
-          }}
-        >
+        <Grid container spacing={24} className={classes.container}>
           {posts.map(({ node }) => (
             <PostCard key={node.fields.slug} node={node} />
           ))}
