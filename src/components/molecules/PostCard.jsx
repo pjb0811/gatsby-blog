@@ -31,7 +31,12 @@ class PostCard extends Component {
               className={classes.cardMedia}
             />
             <CardContent>
-              <Typography gutterBottom variant="h5" component="h2">
+              <Typography
+                gutterBottom
+                variant="h5"
+                component="h2"
+                noWrap={true}
+              >
                 {title || node.fields.slug}
               </Typography>
               <Typography component="p">{node.excerpt}</Typography>
@@ -39,7 +44,13 @@ class PostCard extends Component {
           </CardActionArea>
           <CardActions>
             {tags.map((tag, i) => (
-              <Button key={i} size="small" color="primary">
+              <Button
+                key={i}
+                size="small"
+                color="primary"
+                component={Link}
+                to={`/tags/${tag}`}
+              >
                 {tag}
               </Button>
             ))}

@@ -100,7 +100,7 @@ module.exports = {
         fields: [
           { name: 'title', store: true, attributes: { boost: 20 } },
           { name: 'tags', store: true },
-          { name: 'content' },
+          { name: 'content', store: true },
           { name: 'path', store: true },
         ],
         // How to resolve each field's value for a supported node type

@@ -8,6 +8,8 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import { withStyles } from '@material-ui/core/styles'
 import { Link } from 'gatsby'
+import Chip from '@material-ui/core/Chip'
+import Typography from '@material-ui/core/Typography'
 
 const styles = theme => ({
   popper: {
@@ -17,6 +19,14 @@ const styles = theme => ({
   list: {
     maxHeight: 300,
     overflow: 'auto',
+  },
+  chips: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    flexWrap: 'wrap',
+  },
+  chip: {
+    margin: theme.spacing.unit / 2,
   },
 })
 
@@ -51,7 +61,29 @@ class SearchList extends Component {
                       component={Link}
                       to={result.path}
                     >
-                      <ListItemText primary={result.title} />
+                      <ListItemText
+                        primary={
+                          <Typography
+                            variant="button"
+                            color="inherit"
+                            noWrap={true}
+                          >
+                            {result.title}
+                          </Typography>
+                        }
+                        secondary={
+                          <div className={classes.chips}>
+                            {result.tags.map((tag, i) => (
+                              <Chip
+                                key={i}
+                                label={tag}
+                                color="secondary"
+                                className={classes.chip}
+                              />
+                            ))}
+                          </div>
+                        }
+                      />
                     </ListItem>
                   ))}
                 </List>

@@ -68,6 +68,12 @@ class SearchBox extends Component {
     this.setState({ open: !!results.length, query, results })
   }
 
+  checkEnterKey = event => {
+    if (event.key === 'Enter') {
+      this.search(event)
+    }
+  }
+
   onSuccess = () => {
     this.setState({ open: false })
   }
@@ -98,7 +104,9 @@ class SearchBox extends Component {
           inputRef={node => {
             this.anchorEl = node
           }}
+          onFocus={this.search}
           onChange={this.search}
+          onKeyDown={this.checkEnterKey}
         />
         <SearchList
           open={open}

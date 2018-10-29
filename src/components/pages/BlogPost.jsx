@@ -1,6 +1,6 @@
 import React from 'react'
 import Helmet from 'react-helmet'
-import { graphql } from 'gatsby'
+import { Link, graphql } from 'gatsby'
 import get from 'lodash/get'
 import Layout from '../templates/Layout'
 import Grid from '@material-ui/core/Grid'
@@ -79,6 +79,9 @@ class BlogPost extends React.Component {
                       color="secondary"
                       label={tag}
                       className={classes.chip}
+                      component={Link}
+                      to={`/tags/${tag}`}
+                      clickable
                     />
                   ))}
                 </div>

@@ -13,6 +13,7 @@ import tsImage from '../../assets/typescript.jpg'
 import PostCard from '../molecules/PostCard'
 import Grid from '@material-ui/core/Grid'
 import PageTitle from '../molecules/PageTitle'
+import Helmet from 'react-helmet'
 
 const styles = theme => ({
   root: {
@@ -50,6 +51,7 @@ class Tags extends Component {
 
     return (
       <Layout location={this.props.location}>
+        <Helmet title={`tags - ${tag}`} />
         <ImageCover img={images[tag] || tagImage} alt={tag} />
         <div className={classes.root}>
           <Paper className={classes.paper} elevation={1}>
