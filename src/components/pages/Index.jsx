@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Helmet from 'react-helmet'
 import Layout from '../templates/Layout'
-import ImageCover from '../organisms/ImageCover'
+import ImageCover from '../molecules/ImageCover'
 import PostList from '../organisms/PostList'
 import { navigate } from 'gatsby-link'
 import Paginate from '../organisms/Paginate'

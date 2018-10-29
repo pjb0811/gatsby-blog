@@ -21,11 +21,15 @@ exports.createPages = ({ graphql, actions }) => {
               edges {
                 node {
                   id
-                  excerpt
+                  excerpt(pruneLength: 280)
                   frontmatter {
                     title
                     date(formatString: "YYYY.MM.DD")
                     tags
+                    translation {
+                      title
+                      link
+                    }
                     mainImage {
                       childImageSharp {
                         sizes(maxWidth: 800) {

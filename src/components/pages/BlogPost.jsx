@@ -8,9 +8,10 @@ import { withStyles } from '@material-ui/core/styles'
 import PostNavigation from '../molecules/PostNavigation'
 import { DiscussionEmbed } from 'disqus-react'
 import Paper from '@material-ui/core/Paper'
-import Chip from '@material-ui/core/Chip'
-import ImageCover from '../organisms/ImageCover'
+import Button from '@material-ui/core/Button'
+import ImageCover from '../molecules/ImageCover'
 import PageTitle from '../molecules/PageTitle'
+import TranslationGuide from '../molecules/TranslationGuide'
 
 const styles = theme => ({
   root: {
@@ -26,18 +27,18 @@ const styles = theme => ({
     width: '100%',
     margin: 0,
   },
-  chips: {
+  buttons: {
     display: 'flex',
     justifyContent: 'flex-start',
     flexWrap: 'wrap',
+    marginBottom: theme.spacing.unit,
   },
-  chip: {
+  button: {
     margin: theme.spacing.unit,
   },
   paper: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    padding: theme.spacing.unit * 4,
   },
 })
 
@@ -72,19 +73,20 @@ class BlogPost extends React.Component {
                   title={post.frontmatter.title}
                   subTitle={post.frontmatter.date}
                 />
-                <div className={classes.chips}>
+                <div className={classes.buttons}>
                   {post.frontmatter.tags.map((tag, i) => (
-                    <Chip
+                    <Button
                       key={i}
-                      color="secondary"
-                      label={tag}
-                      className={classes.chip}
+                      color="primary"
+                      className={classes.button}
                       component={Link}
                       to={`/tags/${tag}`}
-                      clickable
-                    />
+                    >
+                      {tag}
+                    </Button>
                   ))}
                 </div>
+                <TranslationGuide translation={post.frontmatter.translation} />
                 <div dangerouslySetInnerHTML={{ __html: post.html }} />
               </Paper>
             </Grid>
@@ -122,6 +124,10 @@ export const pageQuery = graphql`
         title
         date(formatString: "YYYY.MM.DD")
         tags
+        translation {
+          title
+          link
+        }
         mainImage {
           childImageSharp {
             sizes(maxWidth: 1200) {

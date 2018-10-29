@@ -3,7 +3,7 @@ import Helmet from 'react-helmet'
 import { graphql } from 'gatsby'
 import Layout from '../components/templates/Layout'
 import TagList from '../components/organisms/TagList'
-import ImageCover from '../components/organisms/ImageCover'
+import ImageCover from '../components/molecules/ImageCover'
 import tagImage from '../assets/tags.jpg'
 
 class Tags extends Component {

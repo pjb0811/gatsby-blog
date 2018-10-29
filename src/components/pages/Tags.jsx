@@ -3,7 +3,7 @@ import { graphql } from 'gatsby'
 import { withStyles } from '@material-ui/core/styles'
 import Layout from '../templates/Layout'
 import Paper from '@material-ui/core/Paper'
-import ImageCover from '../organisms/ImageCover'
+import ImageCover from '../molecules/ImageCover'
 import tagImage from '../../assets/tags.jpg'
 import jsImage from '../../assets/javascript.png'
 import cssImage from '../../assets/css.jpg'
@@ -55,7 +55,7 @@ class Tags extends Component {
         <ImageCover img={images[tag] || tagImage} alt={tag} />
         <div className={classes.root}>
           <Grid container spacing={24} className={classes.container}>
-            <Grid item xs={12} spacing={24}>
+            <Grid item xs={12}>
               <Paper className={classes.paper} elevation={1}>
                 <PageTitle title={tag} subTitle={`${totalCount}개의 글`} />
                 <Grid container spacing={24}>
