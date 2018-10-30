@@ -21,6 +21,11 @@ const styles = theme => ({
     verticalAlign: 'middle',
     marginLeft: 10,
   },
+  copyright: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 })
 
 class Footer extends Component {
@@ -49,7 +54,12 @@ class Footer extends Component {
               </a>
             </IconButton>
           </div>
-          <Typography variant="subtitle2" color="inherit" align="center">
+          <Typography
+            variant="subtitle2"
+            color="inherit"
+            align="center"
+            className={classes.copyright}
+          >
             Powered by{' '}
             <a href="https://www.gatsbyjs.org/">
               <img

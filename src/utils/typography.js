@@ -25,7 +25,7 @@ githubTheme.overrideThemeStyles = ({ rhythm }, options) => ({
     display: 'inline-flex;',
   },
   img: {
-    marginBottom: 0,
+    marginBottom: '0',
   },
   '.language-javascript .keyword': {
     color: '#d73a49',
@@ -35,6 +35,17 @@ githubTheme.overrideThemeStyles = ({ rhythm }, options) => ({
   },
   '.language-javascript .number': {
     color: '#005cc5',
+  },
+  '.language-javascript .boolean': {
+    color: '#005cc5',
+  },
+  figcaption: {
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+  iframe: {
+    width: '100%',
+    minHeight: '500px',
   },
 })
 
