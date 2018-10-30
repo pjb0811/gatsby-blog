@@ -12,6 +12,7 @@ import Button from '@material-ui/core/Button'
 import ImageCover from '../molecules/ImageCover'
 import PageTitle from '../molecules/PageTitle'
 import TranslationGuide from '../molecules/TranslationGuide'
+import 'github-markdown-css'
 
 const styles = theme => ({
   root: {
@@ -87,7 +88,10 @@ class BlogPost extends React.Component {
                   ))}
                 </div>
                 <TranslationGuide translation={post.frontmatter.translation} />
-                <div dangerouslySetInnerHTML={{ __html: post.html }} />
+                <div
+                  className="markdown-body"
+                  dangerouslySetInnerHTML={{ __html: post.html }}
+                />
               </Paper>
             </Grid>
             <Grid item xs={12}>

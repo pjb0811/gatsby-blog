@@ -18,6 +18,9 @@ githubTheme.overrideThemeStyles = ({ rhythm }, options) => ({
     color: 'inherit',
     textDecoration: 'none',
   },
+  'a:hover': {
+    textDecoration: 'none',
+  },
   'a.icon': {
     display: 'inline-flex;',
   },

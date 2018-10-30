@@ -8,7 +8,6 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import { withStyles } from '@material-ui/core/styles'
 import { Link } from 'gatsby'
-import Chip from '@material-ui/core/Chip'
 import Typography from '@material-ui/core/Typography'
 
 const styles = theme => ({
@@ -71,18 +70,7 @@ class SearchList extends Component {
                             {result.title}
                           </Typography>
                         }
-                        secondary={
-                          <div className={classes.chips}>
-                            {result.tags.map((tag, i) => (
-                              <Chip
-                                key={i}
-                                label={tag}
-                                color="secondary"
-                                className={classes.chip}
-                              />
-                            ))}
-                          </div>
-                        }
+                        secondary={result.tags.join(', ')}
                       />
                     </ListItem>
                   ))}
