@@ -27,6 +27,15 @@ githubTheme.overrideThemeStyles = ({ rhythm }, options) => ({
   img: {
     marginBottom: 0,
   },
+  '.language-javascript .keyword': {
+    color: '#d73a49',
+  },
+  '.language-javascript .function': {
+    color: '#6f42c1',
+  },
+  '.language-javascript .number': {
+    color: '#005cc5',
+  },
 })
 
 const typography = new Typography(githubTheme)

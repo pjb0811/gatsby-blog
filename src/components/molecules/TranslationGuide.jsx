@@ -27,7 +27,7 @@ class TranslationGuide extends Component {
           의역과 오역이 난무하니 자세한 내용은 해당 블로그를 참조하시면 이해가
           더 쉬울 것 같습니다.
         </Typography>
-        <Typography variant="subtitle2" gutterBottom>
+        <Typography variant="subtitle2">
           억지로 번역하면 뜻이 더 모호해지는 단어들은 그 자체로 두었습니다.
         </Typography>
       </div>
