@@ -32,7 +32,7 @@ class Jumbotron extends Component {
           align="center"
           className={`${classes.title} ${classes.subtitle}`}
         >
-          Introduce React, TypeScript, and JavaScript related postings.
+          Introduce HTML, CSS, and JavaScript related postings.
         </Typography>
       </div>
     )

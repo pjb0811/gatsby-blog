@@ -39,13 +39,15 @@ githubTheme.overrideThemeStyles = ({ rhythm }, options) => ({
   '.language-javascript .boolean': {
     color: '#005cc5',
   },
+  '.language-json .boolean': {
+    color: '#005cc5',
+  },
   figcaption: {
     textAlign: 'center',
     fontSize: '14px',
   },
   iframe: {
     width: '100%',
-    minHeight: '500px',
   },
 })
 

@@ -2,7 +2,7 @@
 title: React.Component에서 hooks로
 date: '2018-10-29'
 mainImage: './react-hooks.jpg'
-tags: ['javascript', 'react']
+tags: ['react']
 translation: {
   title: 'From React.Component to hooks',
   link: 'https://medium.com/@dispix/from-react-component-to-hooks-b50241334365'
@@ -138,7 +138,7 @@ function useUpdate(fn) {
 이 기본적인 tic tac toe 게임은 React 16.7 을 사용하여 만들어졌으며 후크를 최대한 활용합니다. 주저하지 말고 탐색하거나 복제하십시오!
 
 <figure>
-  <iframe scrolling="no" frameborder="0" id="player" src="https://codesandbox.io/embed/github/dispix/react-hooks-example?referrer=https%3A%2F%2Fmedium.com%2Fmedia%2F1c8ebd81c7f523fe764ad3e7ecd63f6c%3FpostId%3Db50241334365" allowfullscreen="true"></iframe>
+  <iframe scrolling="no" frameborder="0" id="player" src="https://codesandbox.io/embed/github/dispix/react-hooks-example?referrer=https%3A%2F%2Fmedium.com%2Fmedia%2F1c8ebd81c7f523fe764ad3e7ecd63f6c%3FpostId%3Db50241334365" allowfullscreen="true" style="min-height:500px;"></iframe>
   <figcaption>
     <a href="https://codesandbox.io/s/github/dispix/react-hooks-example">https://codesandbox.io/s/github/dispix/react-hooks-example</a>
   </figcaption>
