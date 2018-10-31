@@ -63,7 +63,7 @@ module.exports = {
         short_name: 'pjb0811 blog',
         start_url: '/',
         background_color: '#ffffff',
-        theme_color: '#663399',
+        theme_color: '#448AFF',
         display: 'minimal-ui',
         icon: 'src/assets/pjb0811.png',
         icons: [
