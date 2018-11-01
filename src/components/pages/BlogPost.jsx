@@ -46,7 +46,6 @@ const styles = theme => ({
 class BlogPost extends React.Component {
   render() {
     const post = this.props.data.markdownRemark
-    const siteTitle = get(this.props, 'data.site.siteMetadata.title')
     const siteDescription = post.excerpt
     const { classes } = this.props
     const disqusShortname = 'pjb0811'
@@ -60,11 +59,11 @@ class BlogPost extends React.Component {
         <Helmet
           htmlAttributes={{ lang: 'en' }}
           meta={[{ name: 'description', content: siteDescription }]}
-          title={`${post.frontmatter.title || siteTitle}`}
+          title={`${post.frontmatter.title}`}
         />
         <ImageCover
           img={post.frontmatter.mainImage.childImageSharp.sizes.src}
-          alt={`${post.frontmatter.title || siteTitle}`}
+          alt={`${post.frontmatter.title}`}
         />
         <div className={classes.root}>
           <Grid container spacing={24} className={classes.container}>

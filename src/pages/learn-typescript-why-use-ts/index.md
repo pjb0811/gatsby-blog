@@ -245,7 +245,7 @@ function convert(em: Emitter): EventSource {
 
 자, 여기서 무엇을 배웠을까요?
 
-먼저, 한 가지 점에 대해 내가 분명하다는 것을 확실히 하고 싶다.
+먼저, 한 가지 점에 대해 내가 분명하다는 것을 확실히 하고 싶습니다.
 
 JavaScript 만 시작하는 경우 지금 바로 TypeScript 로 이동할 필요가 없습니다.
 

@@ -47,8 +47,13 @@ class SideList extends Component {
             <ListItemIcon>
               <Icon className={'fas fa-tag'} />
             </ListItemIcon>
-
             <ListItemText primary={'tags'} />
+          </ListItem>
+          <ListItem button component={Link} to="/analysis">
+            <ListItemIcon>
+              <Icon className={'fas fa-chart-bar'} />
+            </ListItemIcon>
+            <ListItemText primary={'analysis'} />
           </ListItem>
           <a href="mailto:pjb0811@gmail.com">
             <ListItem button>

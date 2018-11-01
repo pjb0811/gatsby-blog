@@ -29,8 +29,8 @@ class AppMenu extends Component {
           </a>
         </IconButton>
         <IconButton color="inherit">
-          <a href="mailto:pjb0811@gmail.com" className="icon">
-            <Icon className={'far fa-envelope'} />
+          <a href="/analysis" className="icon">
+            <Icon className={'fas fa-chart-bar'} />
           </a>
         </IconButton>
       </div>
