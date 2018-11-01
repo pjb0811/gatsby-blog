@@ -48,10 +48,7 @@ class BlogPost extends React.Component {
     const post = data.markdownRemark
     setTimeout(() => {
       window.ga('send', 'pageview', {
-        dimension0: {
-          url: `${pageContext.slug}`,
-          title: `${post.frontmatter.title}`,
-        },
+        dimension0: `${pageContext.slug}|${post.frontmatter.title}`,
       })
     }, 2000)
   }
