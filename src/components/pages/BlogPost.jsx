@@ -44,12 +44,11 @@ const styles = theme => ({
 
 class BlogPost extends React.Component {
   componentDidMount() {
-    const { pageContext, data } = this.props
+    const { data } = this.props
     const post = data.markdownRemark
     setTimeout(() => {
-      window.ga('send', 'pageview', {
-        dimension0: `${pageContext.slug}|${post.frontmatter.title}`,
-      })
+      const dimensionValue = `${post.frontmatter.title}`
+      window.ga('set', 'dimension1', dimensionValue)
     }, 2000)
   }
 
