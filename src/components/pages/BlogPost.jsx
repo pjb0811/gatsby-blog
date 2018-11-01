@@ -1,7 +1,6 @@
 import React from 'react'
 import Helmet from 'react-helmet'
 import { Link, graphql } from 'gatsby'
-import get from 'lodash/get'
 import Layout from '../templates/Layout'
 import Grid from '@material-ui/core/Grid'
 import { withStyles } from '@material-ui/core/styles'
@@ -44,6 +43,17 @@ const styles = theme => ({
 })
 
 class BlogPost extends React.Component {
+  componentDidMount() {
+    const { pageContext, data } = this.props
+    const post = data.markdownRemark
+    setTimeout(() => {
+      window.ga('send', 'pageview', {
+        url: `${pageContext.slug}`,
+        title: `${post.frontmatter.title}`,
+      })
+    }, 2000)
+  }
+
   render() {
     const post = this.props.data.markdownRemark
     const siteDescription = post.excerpt
@@ -60,7 +70,9 @@ class BlogPost extends React.Component {
           htmlAttributes={{ lang: 'en' }}
           meta={[{ name: 'description', content: siteDescription }]}
           title={`${post.frontmatter.title}`}
-        />
+        >
+          <script src="/js/analytics.js" />
+        </Helmet>
         <ImageCover
           img={post.frontmatter.mainImage.childImageSharp.sizes.src}
           alt={`${post.frontmatter.title}`}

@@ -42,8 +42,9 @@ class AnalysisList extends Component {
               <Typography variant="h3" className={classes.title}>
                 인기 포스트
               </Typography>
-              {/* <List >
-              <ListItem
+              {/*
+              <List >
+                <ListItem
                     button
                     component={Link}
                     to={`/tags/${kebabCase(tag.fieldValue)}/`}
@@ -56,7 +57,8 @@ class AnalysisList extends Component {
                       <ListItemText primary={tag.fieldValue} />
                     </Badge>
                   </ListItem>
-              </List>*/}
+              </List>
+              */}
             </Paper>
           </Grid>
         </Grid>

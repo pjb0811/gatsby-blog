@@ -4,6 +4,7 @@ import Typography from '@material-ui/core/Typography'
 import { withStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import { Link } from 'gatsby'
+import Helmet from 'react-helmet'
 
 const styles = theme => ({
   root: {
@@ -33,6 +34,7 @@ class NotFoundPage extends Component {
 
     return (
       <div className={classes.root}>
+        <Helmet title={' Page not found :('} />
         <Paper className={classes.paper} elevation={1}>
           <Typography variant="h3" className={classes.title}>
             Page not found :(
