@@ -43,15 +43,6 @@ const styles = theme => ({
 })
 
 class BlogPost extends React.Component {
-  componentDidMount() {
-    const { data } = this.props
-    const post = data.markdownRemark
-
-    setTimeout(() => {
-      window.ga('set', 'dimension1', post.frontmatter.title)
-    }, 2000)
-  }
-
   render() {
     const post = this.props.data.markdownRemark
     const siteDescription = post.excerpt
@@ -68,9 +59,7 @@ class BlogPost extends React.Component {
           htmlAttributes={{ lang: 'en' }}
           meta={[{ name: 'description', content: siteDescription }]}
           title={`${post.frontmatter.title}`}
-        >
-          <script src="/js/analytics.js" />
-        </Helmet>
+        />
         <ImageCover
           img={post.frontmatter.mainImage.childImageSharp.sizes.src}
           alt={`${post.frontmatter.title}`}
