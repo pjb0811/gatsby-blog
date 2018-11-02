@@ -37,6 +37,9 @@ class AnalysisTabs extends Component {
     if (this.mounted) {
       this.setState({
         reports: this.getFilterReports({ reports: res.result.reports }),
+        errors: {
+          msg: '',
+        },
       })
     }
   }

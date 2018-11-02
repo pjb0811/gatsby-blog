@@ -6,9 +6,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Typography from '@material-ui/core/Typography'
 import { Link } from 'gatsby'
-import { GoogleLogin } from 'react-google-login'
-import Button from '@material-ui/core/Button'
-import googleLogo from '../../assets/google.jpg'
+import GoogleLoginButton from '../atoms/GoogleLoginButton'
 
 const styles = theme => ({
   root: {
@@ -26,15 +24,10 @@ const styles = theme => ({
   signIn: {
     marginTop: 20,
   },
-  googleLogo: {
-    width: 20,
-    height: 20,
-    marginRight: theme.spacing.unit,
-  },
 })
 
 class AnalysisList extends Component {
-  responseGoogle = res => {
+  responseSuccess = res => {
     this.props.resetReports(0)
   }
 
@@ -47,25 +40,7 @@ class AnalysisList extends Component {
             {errors.msg}
           </Typography>
           <div className={classes.signIn}>
-            <GoogleLogin
-              clientId="183407112685-51gi54qhqn734uid2lvvasucse6db0lo.apps.googleusercontent.com"
-              render={renderProps => (
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  className={classes.button}
-                  onClick={renderProps.onClick}
-                >
-                  <img
-                    src={googleLogo}
-                    alt="google"
-                    className={classes.googleLogo}
-                  />
-                  Sign in with Google
-                </Button>
-              )}
-              onSuccess={this.responseGoogle}
-            />
+            <GoogleLoginButton onSuccess={this.responseSuccess} />
           </div>
         </div>
       )
@@ -75,6 +50,7 @@ class AnalysisList extends Component {
       return (
         <div className={classes.root}>
           <CircularProgress className={classes.progress} />
+          <GoogleLoginButton style={{ display: 'none' }} />
         </div>
       )
     }
