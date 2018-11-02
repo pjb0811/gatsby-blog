@@ -3,13 +3,12 @@ import Layout from '../components/templates/Layout'
 import Helmet from 'react-helmet'
 import ImageCover from '../components/molecules/ImageCover'
 import analysisImage from '../assets/analysis.jpg'
-import AnalysisList from '../components/organisms/AnalysisList'
+import AnalysisTabs from '../components/organisms/AnalysisTabs'
 import { graphql } from 'gatsby'
 import { withStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
-import { analytics } from 'google-cloud-apis'
 
 const styles = theme => ({
   root: {
@@ -39,74 +38,9 @@ const styles = theme => ({
 })
 
 class analysis extends Component {
-  state = {
-    reports: [],
-  }
-
-  componentDidMount() {
-    this.getReports({ dateRange: 7 })
-  }
-
-  getReports = async ({ dateRange }) => {
-    const res = await analytics({
-      delay: 1000,
-      viewId: '183746371',
-      data: {
-        dateRanges: [
-          {
-            startDate: `${dateRange}daysAgo`,
-            endDate: 'today',
-          },
-        ],
-        metrics: [{ expression: 'ga:pageviews' }],
-        dimensions: [{ name: 'ga:pagePath' }],
-        orderBys: [
-          {
-            fieldName: 'ga:pageviews',
-            sortOrder: 'DESCENDING',
-          },
-        ],
-      },
-    })
-
-    this.filterReports({ reports: res.result.reports })
-  }
-
-  filterReports = ({ reports }) => {
-    const { data } = this.props
-    const { edges } = data.allMarkdownRemark
-    const newReports = reports[0].data.rows.reduce((prev, curr) => {
-      let title = ''
-      let date = ''
-      if (
-        edges.some(item => {
-          if (item.node.fields.slug === curr.dimensions[0]) {
-            title = item.node.frontmatter.title
-            date = item.node.frontmatter.date
-            return true
-          }
-          return false
-        })
-      ) {
-        prev.push({
-          url: curr.dimensions[0],
-          title,
-          date,
-          pagaview: curr.metrics[0].values[0],
-        })
-      }
-
-      return prev
-    }, [])
-
-    this.setState({
-      reports: newReports,
-    })
-  }
-
   render() {
-    const { classes } = this.props
-    const { reports } = this.state
+    const { classes, data } = this.props
+    const { edges } = data.allMarkdownRemark
 
     return (
       <Layout location={this.props.location}>
@@ -134,7 +68,7 @@ class analysis extends Component {
                   className={`g-signin2 ${classes.signIn}`}
                   data-onsuccess="queryReports"
                 />
-                <AnalysisList list={reports} />
+                <AnalysisTabs edges={edges} />
               </Paper>
             </Grid>
           </Grid>

@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import CircularProgress from '@material-ui/core/CircularProgress'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemText from '@material-ui/core/ListItemText'
+import Badge from '@material-ui/core/Badge'
+import { Link } from 'gatsby'
 
 const styles = theme => ({
   progressRoot: {
@@ -15,16 +18,9 @@ const styles = theme => ({
 })
 
 class AnalysisList extends Component {
-  state = {
-    tabValue: 0,
-  }
-
-  handleChange = (event, tabValue) => {
-    this.setState({ tabValue })
-  }
-
   render() {
     const { list, classes } = this.props
+    console.log(list)
 
     if (!list.length) {
       return (
@@ -35,17 +31,20 @@ class AnalysisList extends Component {
     }
 
     return (
-      <Tabs
-        value={this.state.tabValue}
-        onChange={this.handleChange}
-        indicatorColor="primary"
-        textColor="primary"
-        centered
-      >
-        <Tab label="지난 7일" />
-        <Tab label="지난 30일" />
-        <Tab label="지난 1년" />
-      </Tabs>
+      <List>
+        {list.map(item => (
+          <ListItem key={item.url} component={Link} to={item.url} button>
+            <ListItemText
+              primary={item.title}
+              primaryTypographyProps={{
+                noWrap: true,
+              }}
+              secondary={item.date}
+            />
+            {item.pageview}
+          </ListItem>
+        ))}
+      </List>
     )
   }
 }

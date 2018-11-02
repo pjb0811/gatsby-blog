@@ -8,7 +8,6 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import { withStyles } from '@material-ui/core/styles'
 import { Link } from 'gatsby'
-import Typography from '@material-ui/core/Typography'
 
 const styles = theme => ({
   popper: {
@@ -61,15 +60,12 @@ class SearchList extends Component {
                       to={result.path}
                     >
                       <ListItemText
-                        primary={
-                          <Typography
-                            variant="button"
-                            color="textPrimary"
-                            noWrap={true}
-                          >
-                            {result.title}
-                          </Typography>
-                        }
+                        primary={result.title}
+                        primaryTypographyProps={{
+                          variant: 'button',
+                          color: 'textPrimary',
+                          noWrap: true,
+                        }}
                         secondary={result.tags.join(', ')}
                       />
                     </ListItem>
