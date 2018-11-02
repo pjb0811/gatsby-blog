@@ -16,14 +16,39 @@ class AnalysisTabs extends Component {
       2: 365,
     },
     reports: [],
+    errors: {
+      msg: '',
+    },
   }
 
   componentDidMount() {
-    this.getReports({ dateRange: 7 }).then(res => {
+    this.mounted = true
+    this.getReports({ dateRange: 7 }).then(
+      this.successResponseReports,
+      this.errorResponseReports
+    )
+  }
+
+  componentWillUnmount() {
+    this.mounted = false
+  }
+
+  successResponseReports = res => {
+    if (this.mounted) {
       this.setState({
         reports: this.getFilterReports({ reports: res.result.reports }),
       })
-    })
+    }
+  }
+
+  errorResponseReports = res => {
+    if (this.mounted) {
+      this.setState({
+        errors: {
+          msg: 'Google 계정을 통해 로그인 해주세요',
+        },
+      })
+    }
   }
 
   getReports = async ({ dateRange }) => {
@@ -79,20 +104,26 @@ class AnalysisTabs extends Component {
   }
 
   tabChange = (event, tabValue) => {
+    this.resetReports(tabValue)
+  }
+
+  resetReports = tabValue => {
     this.setState({
       tabValue,
       reports: [],
+      errors: {
+        msg: '',
+      },
     })
 
-    this.getReports({ dateRange: this.state.range[tabValue] }).then(res => {
-      this.setState({
-        reports: this.getFilterReports({ reports: res.result.reports }),
-      })
-    })
+    this.getReports({ dateRange: this.state.range[tabValue] }).then(
+      this.successResponseReports,
+      this.errorResponseReports
+    )
   }
 
   render() {
-    const { reports } = this.state
+    const { reports, errors } = this.state
 
     return (
       <div>
@@ -107,7 +138,11 @@ class AnalysisTabs extends Component {
           <Tab label="지난 30일" />
           <Tab label="지난 1년" />
         </Tabs>
-        <AnalysisList list={reports} />
+        <AnalysisList
+          list={reports}
+          errors={errors}
+          resetReports={this.resetReports}
+        />
       </div>
     )
   }

@@ -32,9 +32,6 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
   },
-  signIn: {
-    display: 'block',
-  },
 })
 
 class analysis extends Component {
@@ -44,19 +41,8 @@ class analysis extends Component {
 
     return (
       <Layout location={this.props.location}>
-        <Helmet>
-          <title>analysis</title>
-          <meta
-            name="google-signin-client_id"
-            content="183407112685-51gi54qhqn734uid2lvvasucse6db0lo.apps.googleusercontent.com"
-          />
-          <meta
-            name="google-signin-scope"
-            content="https://www.googleapis.com/auth/analytics.readonly"
-          />
-          <script src="https://apis.google.com/js/client:platform.js" />
-        </Helmet>
-        <ImageCover img={analysisImage} alt="tags" />
+        <Helmet title={'analysis'} />
+        <ImageCover img={analysisImage} alt="analysis" />
         <div className={classes.root}>
           <Grid container spacing={24} className={classes.container}>
             <Grid item xs={12}>
@@ -64,10 +50,6 @@ class analysis extends Component {
                 <Typography variant="h3" className={classes.title}>
                   인기 포스트
                 </Typography>
-                <p
-                  className={`g-signin2 ${classes.signIn}`}
-                  data-onsuccess="queryReports"
-                />
                 <AnalysisTabs edges={edges} />
               </Paper>
             </Grid>
