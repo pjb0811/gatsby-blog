@@ -43,6 +43,7 @@
     "eslint-plugin-react": "^7.11.1",
     "fg-loadcss": "^2.0.1",
     "gh-pages": "^1.2.0",
+    "google-cloud-apis": "^1.0.6",
     "jss": "^9.8.7",
     "prettier": "^1.14.2",
     "react-jss": "^8.6.1",
