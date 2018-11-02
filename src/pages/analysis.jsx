@@ -33,7 +33,7 @@ const styles = theme => ({
     paddingBottom: theme.spacing.unit * 2,
   },
   signIn: {
-    display: 'none',
+    display: 'block',
   },
 })
 
