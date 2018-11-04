@@ -53,7 +53,6 @@ module.exports = {
       resolve: 'gatsby-plugin-google-analytics',
       options: {
         trackingId: SITE_CONFIG.googleAnalyticsID,
-        head: true,
         exclude: ['/', '/tags', '/tags/**', '/tags/**/', '/analysis'],
       },
     },
