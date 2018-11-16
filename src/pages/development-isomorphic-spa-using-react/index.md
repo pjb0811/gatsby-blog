@@ -1,6 +1,6 @@
 ---
 title: React를 활용한 isomorphic SPA 개발하기
-date: '2018-10-24'
+date: '2018-11-16'
 mainImage: './spa.jpeg'
 tags: ['react']
 ---
@@ -67,12 +67,60 @@ yarn start
 
 이제 사용하는 브라우저를 통해 기본적으로 설정되어 있는 웹 앱 구조가 마련되는 것을 보실 수 있으실 겁니다.
 
-![app main](./app-main.png)
+![main](./app-main.png)
 
-프로젝트 생성만으로는 SPA 가 되는것은 아니지만 클라이언트 SPA 구현은 `react-router`, `react-helmet` 등 관련 서드파티 라이브러리를 통해 쉽게 개발할 수 있다고 생각합니다. 그리고 앞서 말씀드린대로
+이렣게 프로젝트 생성만으로 SPA 가 되는것은 아니지만 클라이언트 SPA 구현은 `react-router`, `react-helmet` 등 관련 서드파티 라이브러리를 통해 쉽게 개발할 수 있다고 생각합니다. 그리고 그렇게 만들어진 SPA 를 서버에서 실행할수 있게 설정해줌으로써 Isomorphic SPA 가 되는것이죠. 그럼 이제 라우팅 설정과 SSR 설정이 필요한데 저는 SSR 설정부터 진행하도록 하겠습니다.
 
 ### SSR 설정
 
-개인적으로 제일 작업하기 까다로운 부분이기도 하며, 나중에 작업을 하려면 클라이언트 영역의 구조를 수정해야 하는 경우도 생기기도 해서요.
+앞서 말씀드린대로 저는 SSR 설정부터 잔행하도록 하겠습니다. SSR 설정은 개인적으로 제일 작업하기 까다로운 부분이기도 하며, 나중에 작업하려면 클라이언트 영역의 구조를 수정해야 하는 경우도 생기기도 해서요. 그래서 미리 준비를 해놓으려고 합니다.
 
-그럼 우선 서버 렌더링
+우선 앞서 실행한 프로젝트의 페이지 소스 보기를 통해 정적 렌더링이 이루어지는 확인해 보겠습니다.
+
+![main source](./app-main-src.png)
+
+보시는 바와 같이 "root" id 속성을 갖는 div 요소 내에 아무것도 없는 것을 확인하실 수 있습니다. 프론트엔드 영역에서 페이지 호출 후 DOM 렌더링 통해 화면에 보여줄 컨텐츠를 그려주기 때문이죠.
+
+그럼 우선 SSR 에 필요한 서버를 구축하도록 하겠습니다. 저는 서버 구성에 필요한 패키지들을 설치하도록 하겠습니다.
+
+```bash
+yarn global add cross-env nodemon
+
+yarn add --dev express
+```
+
+설치한 패키지들을 간략히 설명드리자면 `cross-env` 는 실행환경의 운영체제에 상관없이 node.js 정보를 설정해줄 수 있는 패키지입니다. `nodemon`은 서버 코드가 수정될 경우 서버를 재시작할 수 있도록 도와주는 패키지이구요. 그리고 `express`를 서버를 구성하기 위한 라이브러리입니다.
+
+설치 완료 후 서버 실행에 필요한 명령어를 `package.json`에 추가하도록 하겠습니다.
+
+```json
+"scripts": {
+  "start": "react-scripts start",
+  "build": "react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject",
+  "serve": "cross-env PORT=9000 nodemon server/index.js"
+}
+```
+
+그리고 서버 구성에 필요한 파일을 `server/index.js` 경로에 추가하도록 하겠습니다.
+
+```javascript
+const express = require('express')
+const app = express()
+const PORT = process.env.PORT || 3000
+
+app.all('*', (req, res) => {
+  res.send('hello!')
+})
+
+app.listen(PORT, console.log(`App listening on port ${PORT}!`))
+```
+
+이제 서버를 실행하면 다음과 같은 화면을 보실수 있으실겁니다.
+
+![server-main](./server-main.png)
+
+페이지 소스를 확인해보면 서버에서 전달받은 데이터를 그대로 보여주고 있습니다.
+
+![server-src](./server-src.png)
