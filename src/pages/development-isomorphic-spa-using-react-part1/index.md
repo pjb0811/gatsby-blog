@@ -125,7 +125,7 @@ export default App
 
 - `public/index.html`
 
-개발 서버 및 빌드 시 사용되는 메인 페이지입니다. "root" id 속성를 갖는 `<div/>` 요소에서 페이지를 렌더링해주도록 하고 있습니다.
+개발 서버 및 빌드 시 사용되는 메인 페이지입니다. "root" id 속성를 갖는 `<div/>` 요소에서 컴포넌트를 렌더링한 결과를 보여주도록 하고 있습니다.
 
 ```html
 <!DOCTYPE html>
@@ -250,7 +250,7 @@ express 에서 제공하는 static 메서드를 통해 build 된 파일을 사�
 
 아직 더 해야 할 작업이 있지만 우선 다시 서버를 실행해 보겠습니다. 정적 리소스만 읽어왔을 뿐인데 정상적인 페이지가 나오게 되는 것을 보실 수 있으실 겁니다.
 
-이러한 이유는 빌드된 파일 중 index.html 이 메인 페이지 호출 시 해당 index.html 를 렌더링하도록 설정이 되기 때문입니다.
+이러한 이유는 서버에서 메인 페이지 호출 시 빌드된 파일 중 하나인 index.html 를 메인 페이지 리소스로 인식하여 렌더링하도록 설정이 되기 때문입니다.
 
 ![server-src2](./server-src2.png)
 
@@ -331,3 +331,73 @@ app.listen(PORT, console.log(`App listening on port ${PORT}!`))
 ```
 
 서버는 정상적으로 실행이 잘됩니다. 이제 화면을 확인해 보겠습니다.
+
+![server-main3](./server-main3.png)
+
+뭔가 나오긴 하는데 조금 이상합니다. 이미지는 깨져있고, 스타일도 적용되어 있지 않네요.
+
+![server-src3](./server-src3.png)
+
+페이지 소스를 확인해 보니 `src/App.js` 컴포넌트의 렌더링 결과는 서버에서 잘 전달해주는 것 같습니다. 하지만 해당 컴포넌트를 감싸는 html 코드가 없네요. 당연한 결과지만 해당 컴포넌트는 html 코드 전체를 그려주지 않기 때문에 렌더링에 필요한 리소스를 가져오지 못합니다. 해당 컴포넌트를 담아낼 html 코드가 필요하니 기존에 번들링된 파일 중 index.html 파일을 읽어서 렌더링에 필요한 데이터를 가져올 수 있도록 하겠습니다.
+
+우선 작업하기 전 패키지 하나를 설치하겠습니다.
+
+```bash
+yarn add --dev pretty
+```
+
+렌더링된 html 코드를 보기 좋게 정리해주는 패키지입니다. 굳이 설정하지 않으셔도 되지만 저는 해당 패키지를 사용하도록 하겠습니다.
+
+이제 서버를 수정하겠습니다.
+
+```javascript
+import express from 'express'
+import fs from 'fs'
+import pretty from 'pretty'
+import renderer from './renderer'
+
+const app = express()
+const PORT = process.env.PORT || 3000
+
+app.use(express.static('build', { index: [] }))
+
+app.all('*', (req, res) => {
+  fs.readFile('build/index.html', 'utf8', (err, data) => {
+    if (err) {
+      throw err
+    }
+
+    const html = renderer(data)
+    res.send(pretty(html))
+  })
+})
+
+app.listen(PORT, console.log(`App listening on port ${PORT}!`))
+```
+
+파일을 읽기 위한 `fs` 및 앞서 설치한 `pretty` 패키지를 임포트했습니다. `fs` 는 node.js 에서 제공하는 기본 패키지이기 때문에 따로 설치하지 않으셔도 됩니다. 그리고 컴포넌트를 렌더링 기능을 담당하는 `server/renderer.js` 파일을 따로 생성했습니다.
+
+이제 페이지가 호출되면 `readFile` 함수를 통해 index.html 파일을 읽어온 뒤 `renderer` 함수에 읽어온 index.html 의 문자열 정보를 넘겨주게 했습니다. 그리고 반환된 결과값을 예쁘게 포장한 뒤 출력하도록 헸습니다. 이제 `server/renderer.js` 코드를 작성하도록 하겠습니다.
+
+```javascript
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import App from '../src/App'
+
+const renderer = html => {
+  const app = renderToString(<App />)
+  return html.replace('<div id="root"></div>', `<div id="root">${app}</div>`)
+}
+
+export default renderer
+```
+
+인자로 html 코드를 받게 되면 컴포넌트 렌더링 문자열을 비어있는 `<div id="root"/>` 요소안에 적용한 결과를 돌려주게 했습니다. 이 전에 클라이언트에서만 담당했던 렌더링 작업을 서버에서도 해주도록 했습니다.
+
+다시 화면을 확인해보도록 하죠.
+
+![server-main4](./server-main4.png)
+
+이제야 원하던 화면을 볼 수 있게 된거 같습니다. 페이지 소스도 확인해 보겠습니다.
+
+![server-src4](./server-src4.png)
