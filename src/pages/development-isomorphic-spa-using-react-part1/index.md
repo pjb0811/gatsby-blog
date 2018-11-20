@@ -364,18 +364,13 @@ import renderer from './renderer'
 
 const app = express()
 const PORT = process.env.PORT || 3000
+const indexHTML = fs.readFileSync('build/index.html', 'utf8')
 
 app.use(express.static('build', { index: [] }))
 
 app.all('*', (req, res) => {
-  fs.readFile('build/index.html', 'utf8', (err, data) => {
-    if (err) {
-      throw err
-    }
-
-    const html = renderer(data)
-    res.send(pretty(html))
-  })
+  const html = renderer(indexHTML)
+  res.send(pretty(html))
 })
 
 app.listen(PORT, console.log(`App listening on port ${PORT}!`))
@@ -383,7 +378,7 @@ app.listen(PORT, console.log(`App listening on port ${PORT}!`))
 
 파일을 읽기 위한 `fs` 및 앞서 설치한 `pretty` 패키지를 임포트했습니다. `fs` 는 node.js 에서 제공하는 기본 기능이기 때문에 따로 설치하지 않으셔도 됩니다. 그리고 컴포넌트를 렌더링 기능을 담당하는 `server/renderer.js` 파일을 따로 생성했습니다.
 
-이제 페이지가 호출되면 `readFile` 함수를 통해 index.html 파일을 읽어온 뒤 `renderer` 함수에 읽어온 index.html 의 문자열 정보를 넘겨주게 했습니다. 그리고 반환된 결과값을 예쁘게 포장한 뒤 출력하도록 헸습니다. 이제 `server/renderer.js` 코드를 작성하도록 하겠습니다.
+이제 페이지가 호출되면 `readFileSync` 함수를 통해 동기적으로 index.html 파일을 읽어온 뒤 `renderer` 함수에 읽어온 index.html 의 문자열 정보를 넘겨주게 했습니다. 그리고 반환된 결과값을 예쁘게 포장한 뒤 출력하도록 헸습니다. 이제 `server/renderer.js` 코드를 작성하도록 하겠습니다.
 
 ```javascript
 import React from 'react'
