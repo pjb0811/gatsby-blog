@@ -1,6 +1,6 @@
 ---
 title: react-motion을 활용한 라이브러리 개발
-date: '2018-11-04'
+date: '2017-11-04'
 mainImage: './react-motion.png'
 tags: ['react', 'css']
 ---
