@@ -92,7 +92,7 @@ serviceWorker.unregister()
 
 기본적으로 제공되는 프로젝트 구성입니다. 프로젝트 생성 시에는 `src/App.js` 컴포넌트 하나로만 이루어져 있습니다.
 
-```jsx
+```javascript
 import React, { Component } from 'react'
 import logo from './logo.svg'
 import './App.css'
@@ -287,7 +287,7 @@ app.use(express.static('build', { index: [] }))
 
 - server/index.js
 
-```jsx
+```javascript
 ...
 
 import App from '../src/App'
@@ -366,7 +366,7 @@ module.exports = function(api) {
 
 - src/renderer.js
 
-```jsx
+```javascript
 import React from 'react'
 import { renderToString } from 'react-dom/server'
 import App from './App'
