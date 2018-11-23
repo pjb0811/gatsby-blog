@@ -288,18 +288,27 @@ app.all('*', (req, res) => {
 })
 ```
 
-이렇게만 해주었을때 정상적으로 동작되면 좋겠지만 node.js 환경에서는 es6 문법 및 react 에서 사용하는 jsx 문법, css 문법 등 프론트엔드 영역에서 사용되는 많은 문법들이 지원되지 않아 실행 시 오류가 발생하게 됩니다. 서버에서 해당 문법들이 정상적으로 동작할 수 있도록 하기 위해 서버를 수정하도록 하겠습니다.
+이렇게만 해주었을때 정상적으로 동작되면 좋겠지만 node.js 환경에서는 es6 문법 및 react 에서 사용하는 jsx 문법, css 문법 등 프론트엔드 영역에서 사용되는 많은 문법들이 지원되지 않아 실행 시 오류가 발생하게 됩니다. 서버에서 해당 문법들이 정상적으로 동작할 수 있도록 하기 위해 서버용 빌드 설정을 추가하도록 하겠습니다.
 
 ```bash
-yarn add --dev @babel/register @babel/preset-env @babel/preset-react babel-plugin-transform-require-ignor babel-plugin-inline-svg
+yarn global add @babel/cli @babel/core
 ```
 
-es6 문법 지원에 필요한 babel 및 관련 플러그인 들을 패키지에 추가하도록 하겠습니다. 이후 `server/index.js` 파일을 수정해주도록 하겠습니다.
+우선 babal 명령어를 사용하기 위한 패키지를 전역으로 설치해 주세요.
+
+```bash
+yarn add --dev @babel/plugin-transform-runtime @babel/preset-env @babel/preset-react babel-plugin-transform-require-ignor babel-plugin-inline-svg
+```
+
+es6 문법 지원에 필요한 babel 및 관련 플러그인 들을 패키지에 추가하도록 하겠습니다. 이제 babel 컴파일에 필요한 `babal.config.js` 파일을 만들어 주도록 하겠습니다.
 
 ```javascript
-require('@babel/register')({
-  presets: ['@babel/preset-env', '@babel/preset-react'],
-  plugins: [
+module.exports = function(api) {
+  api.cache(true)
+  const presets = ['@babel/preset-env', '@babel/preset-react']
+  const plugins = [
+    '@babel/plugin-transform-runtime',
+    '@babel/plugin-proposal-class-properties',
     'babel-plugin-inline-svg',
     [
       'babel-plugin-transform-require-ignore',
@@ -307,13 +316,16 @@ require('@babel/register')({
         extensions: ['.css'],
       },
     ],
-  ],
-})
+  ]
 
-require('./server')
+  return {
+    presets,
+    plugins,
+  }
+}
 ```
 
-서버 실행 전 babel 설정을 통해 react 컴포넌트를 정상적으로 import 하도록 설정했습니다. 그리고 플러그인 설정을 통해 메인 컴포넌트에서 호출하는 svg 파일 접근 및 css 파일을 무시하도록 했습니다.
+서버 실행 시 babel 로 컴파일된 파일을 사용하여 react 컴포넌트를 정상적으로 import 하도록 설정했습니다. 서버 실행 시 직접 babel 플러그인을 호출되도 
 
 현재 설정의 경우 CRA 에서 제공되는 기본 컴포넌트 호출에 대한 설정만 해주었지만, 프로젝트를 개발하면서 추가 설정이 필요한 경우 상황에 맞게 추가해주면 될꺼 같네요.
 
