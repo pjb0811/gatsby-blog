@@ -196,6 +196,8 @@ yarn add --dev express
 
 설치 완료 후 서버 실행에 필요한 명령어를 `package.json`에 추가하도록 하겠습니다.
 
+- package.json
+
 ```json
 "scripts": {
   "start": "react-scripts start",
@@ -207,6 +209,8 @@ yarn add --dev express
 ```
 
 그리고 서버 구성에 필요한 파일을 `server/index.js` 경로에 추가하도록 하겠습니다. 포트 설정 및 라우팅 설정 후 서버를 시작하게 해줍니다.
+
+- server/index.js
 
 ```javascript
 const express = require('express')
@@ -240,6 +244,8 @@ yarn build
 
 완료가 되면 build 폴더가 생성되는 것을 확인할 수 있습니다. 해당 폴더에는 현재 프로젝트에 대한 번들링 파일들을 제공합니다. 이제 번들링된 파일을 서버에서 읽을 수 있도록 `server/index.js` 파일을 수정하겠습니다.
 
+- server/index.js
+
 ```javascript
 ...
 app.use(express.static('build'));
@@ -265,6 +271,8 @@ express 에서 제공하는 static 메서드를 통해 build 된 파일을 사�
 
 이제 메인 페이지 접근 시에도 라우팅 설정 정보에 접근할 수 있게 static 메서드 호출 시 인자를 추가하도록 하겠습니다.
 
+- server/index.js
+
 ```javascript
 app.use(express.static('build', { index: [] }))
 ```
@@ -275,9 +283,13 @@ app.use(express.static('build', { index: [] }))
 
 ### 컴포넌트 렌더링
 
-그럼 이제 메인 페이지에서 react 컴포넌트를 렌더링하도록 해주면 될것 같습니다. 컴포넌트 정보를 문자열로 변경하주는 `renderToString` 및 프로젝트의 메인 컴포넌트인 `src/App.js` 파일을 import 하도록 하겠습니다. 그리고 페이지 호출 시 해당 컴포넌트의 렌더링 정보를 뿌려주도록 설정해줍니다.
+그럼 이제 메인 페이지에서 react 컴포넌트를 렌더링하도록 해주면 될것 같습니다. 컴포넌트 정보를 문자열로 변경하주는 `renderToString` 및 프로젝트의 메인 컴포넌트인 `src/App.js` 파일을 import 하도록 하겠습니다. 그리고 페이지 호출 시 해당 컴포넌트의 렌더링 정보를 뿌려주도록 `server/index.js` 파일을 수정하겠습니다.
+
+- server/index.js
 
 ```jsx
+...
+
 import App from '../src/App'
 import { renderToString } from 'react-dom/server';
 
@@ -288,7 +300,7 @@ app.all('*', (req, res) => {
 })
 ```
 
-이렇게만 해주었을때 정상적으로 동작되면 좋겠지만 node.js 환경에서는 es6 문법 및 react 에서 사용하는 jsx 문법, css 문법 등 프론트엔드 영역에서 사용되는 많은 문법들이 지원되지 않아 실행 시 오류가 발생하게 됩니다. 서버에서 해당 문법들이 정상적으로 동작할 수 있도록 하기 위해 서버용 빌드 설정을 추가하도록 하겠습니다.
+이렇게만 해주었을때 정상적으로 동작되면 좋겠지만 node.js 환경에서는 es6 문법 및 react 에서 사용하는 jsx 문법, css 문법 등 프론트엔드 영역에서 사용되는 많은 문법들이 지원되지 않아 실행 시 오류가 발생하게 됩니다. 서버에서 해당 문법들이 정상적으로 동작할 수 있도록 하기 위해 서버 전용 빌드 설정을 추가하도록 하겠습니다.
 
 ```bash
 yarn global add @babel/cli @babel/core
@@ -301,6 +313,8 @@ yarn add --dev @babel/plugin-transform-runtime @babel/preset-env @babel/preset-r
 ```
 
 es6 문법 지원에 필요한 babel 및 관련 플러그인 들을 패키지에 추가하도록 하겠습니다. 이제 babel 컴파일에 필요한 `babal.config.js` 파일을 만들어 주도록 하겠습니다.
+
+- babel.config.js
 
 ```javascript
 module.exports = function(api) {
@@ -325,16 +339,53 @@ module.exports = function(api) {
 }
 ```
 
-서버 실행 시 babel 로 컴파일된 파일을 사용하여 react 컴포넌트를 정상적으로 import 하도록 설정했습니다. 서버 실행 시 직접 babel 플러그인을 호출되도 
+`.babelrc` 파일로 프리셋 및 플러그인 설정을 해줘도 되지만 저는 `babel.config.js` 파일을 사용했습니다. 해당 파일에서 babel 사용 시 필요한 프리셋 및 플러그인을 사용할 수 있도록 설정했습니다. 현재 설정의 경우 현재 프로젝트에서 사용하는 컴포넌트에 필요한 설정만 해주었지만, 프로젝트를 개발하면서 추가 설정이 필요한 경우 상황에 맞게 추가해주면 될꺼 같네요. 보다 자세한 사용법은 babel Docs 를 참고하시면 될 것 같습니다.
 
-현재 설정의 경우 CRA 에서 제공되는 기본 컴포넌트 호출에 대한 설정만 해주었지만, 프로젝트를 개발하면서 추가 설정이 필요한 경우 상황에 맞게 추가해주면 될꺼 같네요.
+이제 서버용 컴포넌트 파일을 생성하기 위한 명령어를 `package.json`에 추가하도록 하겠습니다.
 
-그리고 `server/server.js` 파일을 생성한 후 기존 `server/index.js`에 있던 코드를 옮기도록 하겠습니다.
+- package.json
+
+```json
+"scripts": {
+  "start": "react-scripts start",
+  "build": "react-scripts build",
+  "build:serve": "babel src --out-dir build.server --copy-files",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject",
+  "serve": "cross-env PORT=9000 nodemon server/index.js"
+}
+```
+
+서버용 컴포넌트 파일을 빌드해주는 **build:serve** 명령어를 추가했습니다. `src` 폴더에 있는 컴포넌트 파일을 `build.server`에 컴파일하도록 설정했습니다. 그리고 js 파일 이외의 것들은 복사해 가지고 오도록 설정했습니다. 이 외에도 명령어 실행 시 다양한 옵션을 줄 수 있는데 자세한 내용은 babel 관련 Docs 를 참고하시면 될 것 같습니다.
+
+이제 명령어를 실행해 보시면 `build.server` 폴더가 생성되고 폴더안에는 `src` 폴더에서 사용 중인 컴파일된 js 파일 및 css 파일 등을 확인하실 수 있으실 겁니다.
+
+사실 클라이언트 컴포넌트를 따로 컴파일하지 않고 서버에서 런타임 시 직접 babel 을 설정해줘도 되지만 런타임 시 직접 컴포넌트에 접근하여 코드를 변환하는 작업을 거치게 되면 불필요한 자원이 낭비된다고 볼 수 있겟죠.
+
+이제 서버에서 사용할 컴포넌트 렌더링 관련 파일을 만들도록 하겠습니다. `src/renderer.js` 파일을 생성한 후 `server/index.js`에 있던 코드 중 렌더링 관련 코드를 옮기도록 하겠습니다.
+
+- src/renderer.js
+
+```jsx
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import App from './App'
+
+const renderer = () => {
+  return renderToString(<App />)
+}
+
+module.exports = renderer
+```
+
+서버에서 직접 컴포넌트 렌더링하지 않고 컴파일된 빌드 파일에 접근하기 위해 클라이언트 영역에 파일을 만들어 주었습니다. 이제 컴파일된 해당 파일을 서버에서 사용할 수 있도록 `server/index.js` 파일을 수정하도록 하겠습니다.
+
+- server/index.js
 
 ```javascript
-import express from 'express'
-import App from '../src/App'
-import { renderToString } from 'react-dom/server'
+const express = require('express')
+const fs = require('fs')
+const renderer = require('../build.server/renderer')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -342,13 +393,13 @@ const PORT = process.env.PORT || 3000
 app.use(express.static('build', { index: [] }))
 
 app.all('*', (req, res) => {
-  res.send(renderToString(<App />))
+  res.send(renderer())
 })
 
 app.listen(PORT, console.log(`App listening on port ${PORT}!`))
 ```
 
-서버는 정상적으로 실행이 잘됩니다. 이제 화면을 확인해 보겠습니다.
+서버에서 렌더링 함수를 호출하여 컴포넌트 렌더링 결과를 보여주도록 설정했습니다. 앞서 설정한 서버용 빌드 명령어를 실행한 후 다시 서버를 실행해 주세요. 서버는 정상적으로 실행이 잘됩니다. 이제 화면을 확인해 보겠습니다.
 
 ![server-main3](./server-main3.png)
 
@@ -366,13 +417,15 @@ yarn add --dev pretty
 
 렌더링된 html 코드를 보기 좋게 정리해주는 패키지입니다. 굳이 설정하지 않으셔도 되지만 저는 해당 패키지를 사용하도록 하겠습니다.
 
-이제 서버를 수정하겠습니다.
+먼저 서버를 수정하겠습니다.
+
+- server/index.js
 
 ```javascript
-import express from 'express'
-import fs from 'fs'
-import pretty from 'pretty'
-import renderer from './renderer'
+const express = require('express')
+const fs = require('fs')
+const pretty = require('pretty')
+const renderer = require('../build.server/renderer')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -388,24 +441,26 @@ app.all('*', (req, res) => {
 app.listen(PORT, console.log(`App listening on port ${PORT}!`))
 ```
 
-파일을 읽기 위한 `fs` 및 앞서 설치한 `pretty` 패키지를 임포트했습니다. `fs` 는 node.js 에서 제공하는 기본 기능이기 때문에 따로 설치하지 않으셔도 됩니다. 그리고 컴포넌트를 렌더링 기능을 담당하는 `server/renderer.js` 파일을 따로 생성했습니다.
+파일을 읽기 위한 `fs` 및 앞서 설치한 `pretty` 패키지를 임포트했습니다. `fs` 는 node.js 에서 제공하는 기본 기능이기 때문에 따로 설치하지 않으셔도 됩니다.
 
-이제 페이지가 호출되면 `readFileSync` 함수를 통해 동기적으로 index.html 파일을 읽어온 뒤 `renderer` 함수에 읽어온 index.html 의 문자열 정보를 넘겨주게 했습니다. 그리고 반환된 결과값을 예쁘게 포장한 뒤 출력하도록 헸습니다. 이제 `server/renderer.js` 코드를 작성하도록 하겠습니다.
+이제 페이지가 호출되면 `readFileSync` 함수를 통해 동기적으로 index.html 파일을 읽어온 뒤 `renderer` 함수에 읽어온 index.html 의 문자열 정보를 넘겨주게 했습니다. 그리고 반환된 결과값을 예쁘게 포장한 뒤 출력하도록 헸습니다. 이제 `src/renderer.js` 코드를 수정하도록 하겠습니다.
+
+- src/renderer.js
 
 ```javascript
 import React from 'react'
 import { renderToString } from 'react-dom/server'
-import App from '../src/App'
+import App from './App'
 
 const renderer = html => {
   const app = renderToString(<App />)
   return html.replace('<div id="root"></div>', `<div id="root">${app}</div>`)
 }
 
-export default renderer
+module.exports = renderer
 ```
 
-인자로 html 코드를 받게 되면 컴포넌트 렌더링 문자열을 비어있는 `<div id="root"/>` 요소안에 적용한 결과를 돌려주게 했습니다. 이 전에 클라이언트에서만 담당했던 렌더링 작업을 서버에서도 해주도록 했습니다.
+인자로 html 코드를 받게 수정했습니다. html 코드를 받게되면 컴포넌트 렌더링 문자열을 비어있는 `<div id="root"/>` 요소안에 적용한 결과를 돌려주게 했습니다. 이 전에 클라이언트에서만 담당했던 렌더링 작업을 서버에서도 해주도록 했습니다.
 
 다시 화면을 확인해보도록 하죠.
 
@@ -419,6 +474,6 @@ export default renderer
 
 ## 다음 과제
 
-지금까지 기본적인 Isomorphic SPA 의 개념 및 CRA 를 활용한 SSR 기본적인 구현에 대한 내용을 소개해 드렸습니다. 아직 부족한 내용도 많고 설명을 제대로 못드린 부분도 있다고 생각합니다. 그대로 처음 개발을 시작하시는 분들에게 조금이라도 도움이 되었으면 하는 바람입니다.
+지금까지 기본적인 Isomorphic SPA 의 개념 및 CRA 를 활용한 SSR 기본적인 구현에 대한 내용을 소개해 드렸습니다. 아직 부족한 내용도 많고 설명을 제대로 못드린 부분도 있다고 생각합니다. 그래도 처음 개발을 시작하시는 분들에게 조금이라도 도움이 되었으면 하는 바람입니다.
 
-다음 2 부에서는 비동기 데이터 및 전역 상태에 대한 SSR 설정에 대해 소개하도록 하겠습니다.
+다음 2 부에서는 라우팅 설정 및 비동기 데이터에 대한 SSR 설정에 대해 소개하도록 하겠습니다.
