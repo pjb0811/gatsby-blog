@@ -352,11 +352,11 @@ module.exports = function(api) {
   "build:serve": "babel src --out-dir build.server --copy-files",
   "test": "react-scripts test",
   "eject": "react-scripts eject",
-  "serve": "cross-env PORT=9000 nodemon server/index.js"
+  "serve": "yarn build && yarn build:serve && cross-env PORT=9000 nodemon server/index.js"
 }
 ```
 
-서버용 컴포넌트 파일을 빌드해주는 **build:serve** 명령어를 추가했습니다. `src` 폴더에 있는 컴포넌트 파일을 `build.server`에 컴파일하도록 설정했습니다. 그리고 js 파일 이외의 것들은 복사해 가지고 오도록 설정했습니다. 이 외에도 명령어 실행 시 다양한 옵션을 줄 수 있는데 자세한 내용은 babel 관련 Docs 를 참고하시면 될 것 같습니다.
+서버용 컴포넌트 파일을 빌드해주는 **build:serve** 명령어를 추가했습니다. 그리고 개발 서버 실행 전 컴포넌트 빌드를 해줄 수 있도록 수정했습니다. `src` 폴더에 있는 컴포넌트 파일을 `build.server`에 컴파일하도록 설정했습니다. 그리고 js 파일 이외의 것들은 복사해 가지고 오도록 설정했습니다. 이 외에도 명령어 실행 시 다양한 옵션을 줄 수 있는데 자세한 내용은 babel 관련 Docs 를 참고하시면 될 것 같습니다.
 
 이제 명령어를 실행해 보시면 `build.server` 폴더가 생성되고 폴더안에는 `src` 폴더에서 사용 중인 컴파일된 js 파일 및 css 파일 등을 확인하실 수 있으실 겁니다.
 
