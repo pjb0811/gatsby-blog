@@ -454,6 +454,50 @@ export default RedirectRoute
 
 지금까지 클라이언트 영역에서만 라우팅 처리를 했는데, 이제 클라이언트에 설정한 라우팅 정보를 서버에서 활용할 수 있도록 작업을 진행하겠습니다.
 
+기본적인 서버 렌더링을 위한 설정은 간단합니다. 우선 기존에 있던 `renderer.js` 파일 경로를 `src/lib` 안으로 옮긴 뒤, 서버 렌더링 시 라우팅 설정을 해주도록 하겠습니다.
+
+- `src/lib/renderer.js`
+
+```javascript
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import { StaticRouter } from 'react-router-dom'
+import App from './App'
+
+const renderer = ({ req, html }) => {
+  const app = renderToString(
+    <StaticRouter location={req.url}>
+      <App />
+    </StaticRouter>
+  )
+  return html.replace('<div id="root"></div>', `<div id="root">${app}</div>`)
+}
+
+module.exports = renderer
+```
+
+컴포넌트 렌더링 시 `react-router-dom`에서 제공하는 `StaticRouter` 컴포넌트로 감싸주도록 했습니다. `StaticRouter` 컴포넌트 설정 시 서버로부터 전달받은 라우팅 주소를 `location`이라는 props 로 전달해주도록 했습니다. 서버 호출 시 라우팅 주소를 전달받기 위해 `server/index.js` 를 수정하도록 하겠습니다.
+
+- `server/index.js`
+
+```javascript
+...
+const renderer = require('../build.server/lib/renderer')
+
+...
+app.all('*', (req, res) => {
+  const html = renderer({ req, html: indexHTML });
+  res.send(pretty(html));
+});
+...
+```
+
+렌더링 함수 호출 경로를 수정한 뒤 함수 호출 시, 서버 라우팅 정보를 전달하기 위해 매개변수를 추가하도록 수정했습니다. 수정을 완료한 후 서버를 실행하도록 하겠습니다.
+
+![routing-ssr](./routing-ssr.png)
+
+페이지 소스 확인 시, 서버 호출 시에도 렌더링이 잘 이루어지는 것을 확인했습니다.
+
 ## 다음 과제
 
 지금까지 Isomorphic SPA 의 라우팅 구현에 대한 내용을 소개해 드렸습니다. 다음 3 부에서는 코트 스플리팅에 대해 소개하도록 하겠습니다.
