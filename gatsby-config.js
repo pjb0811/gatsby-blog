@@ -67,6 +67,7 @@ module.exports = {
                 author
                 description
                 siteUrl
+                site_url: siteUrl
               }
             }
           }
@@ -90,6 +91,7 @@ module.exports = {
                 allMarkdownRemark(
                   limit: 1000,
                   sort: { order: DESC, fields: [frontmatter___date] },
+                  filter: {frontmatter: { draft: { ne: true } }}
                 ) {
                   edges {
                     node {
@@ -107,6 +109,7 @@ module.exports = {
               }
             `,
             output: SITE_CONFIG.siteRss,
+            title: SITE_CONFIG.title
           },
         ],
       },
