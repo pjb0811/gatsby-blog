@@ -1,10 +1,8 @@
 ---
 title: TypeScript를 활용한 JQuery 프로젝트 리팩토링
-date: '2017-11-04'
-mainImage: './react-motion.png'
-tags: ['react', 'css']
+date: '2018-12-19'
+mainImage: './refactoring-ts.png'
+tags: ['javascript', 'typescript']
 ---
 
-## react-motion 을 활용하기
-
-ㅁㅇㄹㅇㅁㄹ
+## 제목 2
