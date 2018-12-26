@@ -83,9 +83,9 @@ const Routes = [
 export default Routes
 ```
 
-우선 라우팅 컴포넌트를 호출하는 코드를 수정하자. 기존에는 기본적인 import 문법으로 컴포넌트를 호출하여 `react-router-dom` 에서 제공하는 `Route` 컴포넌트의 매개변수로 라우팅 컴포넌트를 넘겨주었다.
+우선 라우팅 컴포넌트를 호출하는 코드를 수정하자. 기존에는 기본적인 import 문법으로 컴포넌트를 호출하여 `react-router-dom` 에서 제공하는 `Route` 컴포넌트의 매개변수로 라우팅 컴포넌트를 넘겨주었다. 코드 스플리팅 적용을 위해 `react-loadable` 라이브러리를 `Loadable`이라는 이름으로 설정한 뒤, 함수 호출 형식으로 `Route` 컴포넌트에 인자로 넘겨주도록 했다. es6 문법에서 제공되는 dynamic import 구문을 통해 라우팅 정보에 맞는 컴포넌트 및 impor 되기 전, 로딩 시점의 컴포넌트를 적용하도록 설정했다.
 
-### 부록 - 나중에 정리할 일
+### 나중에 정리할 일
 
 - `src/index.js`
 
@@ -111,7 +111,7 @@ Loadable.preloadReady().then(() => {
 
 ## Server
 
-### 부록 - 나중에 정리할 일
+### 나중에 정리할 일
 
 ## 다음 과제
 
