@@ -5,4 +5,4 @@ mainImage: './refactoring-ts.png'
 tags: ['javascript', 'typescript']
 ---
 
-## 제목 2
+## 준비 중...
