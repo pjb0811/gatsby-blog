@@ -49,6 +49,10 @@ githubTheme.overrideThemeStyles = ({ rhythm }, options) => ({
   iframe: {
     width: '100%',
   },
+  'img[src*=".gif"]': {
+    display: 'block',
+    margin: '0 auto',
+  },
 })
 
 const typography = new Typography(githubTheme)
