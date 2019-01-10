@@ -39,6 +39,18 @@ githubTheme.overrideThemeStyles = ({ rhythm }, options) => ({
   '.language-javascript .boolean': {
     color: '#005cc5',
   },
+  '.language-typescript .keyword': {
+    color: '#d73a49',
+  },
+  '.language-typescript .function': {
+    color: '#6f42c1',
+  },
+  '.language-typescript .number': {
+    color: '#005cc5',
+  },
+  '.language-typescript .boolean': {
+    color: '#005cc5',
+  },
   '.language-json .boolean': {
     color: '#005cc5',
   },

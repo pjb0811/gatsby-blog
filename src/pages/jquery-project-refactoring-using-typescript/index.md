@@ -82,7 +82,7 @@ tags: ['javascript', 'typescript']
 
 리펙토링을 진행한 프로젝트에 경우 `webpack.config.js` 파일에서 개발과 운영환경에 관련된 여러가지 파일을 모듈로 호출해서 사용하고 있다. 따로 파일명을 언급하기 보다는 수정된 내용과 관련된 코드 영역만 설명했다.
 
-```javascript
+```typescript
 // ...
 const entryResourcePcTs = entryLoader(PATHS.ENTRIES_DIR, 'pc/**/*.ts')
 const entryResourceMobileTs = entryLoader(PATHS.ENTRIES_DIR, 'm/**/*.ts')
@@ -101,7 +101,7 @@ const entry = Object.assign(
 
 번들링 시 엔트리 파일을 설정해주는 영역에 `.ts` 파일을 추가한 뒤, 앤트리 영역 정보를 가지는 객체 리터럴에 추가할 수 있도록 수정했다. 이 후 `.js` 파일로 구성된 엔트리 영역은 모두 TypeScript로 리펙토링하였지만 혹시 모를 사이드 이펙트를 감안해 기존 엔트리파일을 불러오는 부분은 따로 제거하지 않았다.
 
-```javascript
+```typescript
 const { CheckerPlugin } = require('awesome-typescript-loader')
 // ...
 
@@ -213,7 +213,7 @@ typescript의 경우 컴파일 및 빌드 시 webpack 설정에 크게 의존적
 
 그래서 우선 `require` 대신 `import` 구문으로 모듈을 호출해보니 호출된 모듈에서 내보낼 모듈을 찾을 수 없다는 에러를 확인했다. 해당 에러를 확인하니 조금 감이 오기 시작했다. 이후 호출한 모듈에서 내보내기 형식을 `module.exports` 대신 `export` 방식으로 변경하니 모듈을 호출한 영역에서 이 전에 확인하지 못했던 타입 에러들을 확인할 수 있었다. `jquery` 라이브러리 또한 `import` 방식으로 변경한 후 관련 모듈 사용에 대한 타입 에러들을 확인할 수 있다.
 
-```javascript
+```typescript
 // const foo = require('foo');
 // const $ = require('jquery')
 
@@ -228,10 +228,10 @@ const bar = () => {}
 export default bar
 ```
 
-위와 같이 기존 코드의 모듈 호출 방식을 `import`, `export` 방식으로 변경해주었다. 이 후 관련 내용을 확인해보니 `import` 및 `export` 로 모듈이 연결되었을때만 해당 모듈을 인식하는 것으로 확인했다.
+위와 같이 기존 코드의 모듈 호출 방식을 `import`, `export` 방식으로 변경해주었다. 이 후 관련된 문서를 확인해보니 `import` 및 `export` 로 모듈이 연결되었을때만 해당 모듈을 인식하는 것으로 확인했다.
 `require`를 통한 호출의 문제가 아니었기 때문에 해당 구문을 사용할 경우에도 `import` 선언을 통해 정상적인 동작을 확인할 수 있었다.
 
-```javascript
+```typescript
 // foo.ts
 const $ = require('jquery')
 
@@ -240,6 +240,7 @@ const foo = () => {}
 module.exports = foo
 
 // bar.ts
+// error
 const $ = require('jquery')
 
 const bar = () => {}
@@ -249,27 +250,82 @@ module.exports = bar
 
 이 후 파일들을 수정하다 보니 파일에 `import`, `export` 구문이 없을 경우 전역 범위에서 사용되는 모듈로 인식되어 위와 같이 여러개의 모듈에서 동일한 이름의 변수룰 선언하는 경우 오류가 발생하는 것을 확인했다.
 
-사실 앞서 설명드린 내용들은 아주 기초적인 내용이라 볼 수 있지만, 나의 경우 다른 개인적인 프로젝트에서 TypeScript를 사용할 때는 자연스럽게 `import`, `export` 구문을 활용하다보니 `commonjs` 방식에서 어떻게 동작하는지에 대한 인식이 없었던 것 같고, 이 번 작업을 통해 배웠다고 생각한다.
-
-### global valiable
+앞서 설명드린 내용들은 아주 기초적인 내용이라 볼 수 있지만, 나의 경우 다른 개인적인 프로젝트에서 TypeScript를 사용할 때는 자연스럽게 `import`, `export` 구문을 활용하다보니 `commonjs` 방식에서 어떻게 동작하는지에 대한 인식이 없었던 것 같고, 이 번 작업을 통해 배웠다고 생각한다.
 
 ### JQuery
 
-`jquery`를 주로 활용한 프로젝트이다 보니 `jquery`와 관련된 타입 확인이 리펙토링의 주된 작업 내용이었다. 이와 관련해서 어떠한 타입들을 사용했는지 정리했다.
+`jquery`를 주로 활용한 프로젝트이다 보니 `jquery`와 관련된 타입 확인이 리펙토링의 주된 작업 내용이었다. 이와 관련해서 어떠한 내용들을 이해했는지 정리했다.
 
-```javascript
+```typescript
 let $foo: JQuery
 $bar = $('#foo')
 
 let $bar: JQuery<HTMLElement>
 $bar = $('#bar')
+
+const baz = ($el: JQuery) => {
+  return $el
+}
 ```
 
-`jquery`를 활용해 `DOM` 정보를 가지는 변수의 경우 `JQuery`라는 타입을 통해 변수 타입을 지정해 주어야 한다. 변수 선언 시 초기화가 되지 않은 변수들의 경우 해당 타입을 지정해주었다. 해당 타입의 기본적인 형식 인수로는 `HTMLElement` 타입이 선언된다. 해당 타입은 이벤트 타겟이거나 요소 종류에 따라 변경이 필요하다.
+`jquery`를 활용해 `DOM` 정보를 가지는 변수의 경우 `JQuery`라는 타입을 통해 변수 타입을 지정해 주어야 한다. 변수 선언 시 초기화가 되지 않은 변수 및 인자들의 경우 해당 타입을 지정해주었다. 해당 타입의 기본적인 제네릭 형식 인수로는 `HTMLElement` 타입이 선언된다. 해당 타입은 이벤트 타겟이거나 요소의 종류에 따라 변경이 필요하다.
+
+### Type Assertion
+
+`jquery`를 통해 `DOM` 요소에 접근하였다 하더라도 그 요소가 가지고 있는 속성에 접근할 경우 해당 요소는 개발자 관점에서 미처 예측하지 못한 수많은 타입을 가지게 된다. 어찌보면 JQuery 뿐만 아니라 JavaScript 환경 전체를 아우르는 기준이며, 이는 TypeScript의 강력한 타입 추론 기능의 장점이다.
+
+사실 추론된 타입을 가장 일반적인 타입(Best common type)으로 볼 수 있지만, 경우에 따라서(특히 `DOM` 요소의 접근과 관하여) 개발자가 의도한 타입과 다르게 추론하거나 너무 보수적으로 추론하는 경우 개발자 관점에서 해당 타입을 단언(Type Assertion)해 줄 수 있다.
+
+- `test.html`
+
+```html
+<div id="foo"></div>
+<script src="test.js"></script>
+```
+
+- `test.js`
+
+```typescript
+// string 타입으로 추론
+let id = ''
+
+// error. attr 메서드의 반환 타입은 string | undefined
+id = $('#foo')
+  .attr('id', 'foo')
+  .attr('id')
+```
+
+`foo`라는 `id` 속성를 갖는 요소의 `id`값을 확인하기 위해 `attr` 함수를 활용하는 예시 코드이다. 이미 해당 요소의 `id` 값은 개발자가 인지하고 있기 때문에 실제로 위와 같은 코드를 작성하진 않겠지만 타입을 추론하는 관점을 확인하기 위한 코드로 생각하면 된다.
+
+우선 `let`으로 선언된 `id`라는 변수의 초기값을 `''` 으로 선언해주었다. 변수 초기화 시 지정된 값을 통해 `string` 타입이 추론된다. 이 후 `attr` 메서드를 통해 반환된 `id`값을 해당 변수값으로 설정하도록 했다. 개발자의 관점에서 보면 해당 `id`값은 당연히 `string` 타입이 되겠지만 TypeScript 환경에서는 에러가 된다.
+
+`attr` 메서드는 접근한 요소가 어떠한 속성을 가지고 있지는 확인하지 않는다. `attr` 뿐만 아니라 `JQuery`에서 제공되는 모든 함수는 함수 그 자체의 기능에 대한 타입만을 추론한다(`DOM`에서 제공하는 메서드 또한 마찬가지이다). 설령 접근한 요소에 대한 속성을 미리 설정해준다해도 말이다.
+
+```typescript
+// type assertion
+id = $('#foo').attr('id') as string
+// or
+id = <string>$('#foo').attr('id')
+```
+
+실제 리펙토링 시에도 `DOM`과 `jquery`를 활용한 메서드의 반환 타입이 개발자가 인지하고 있는 타입과 달라 수많은 에러를 확인할 수 있었다. 추론된 타입에 맞춰 코드를 수정해줄 수도 있지만 그럴 경우 생각 이상의 작업을 진행해야 했기 때문에 타입 단언을 통해 어떠한 타입을 추론해야 하는지 힌트를 주도록 했다.
+
+위와 같이 `attr` 메서드의 반환 타입을 `as` 문법을 통해 `string`으로 지정해 주었다. 또는 제네릭 문법을 활용할 수 있다. 나의 경우 `as` 문법을 통해 타입을 단업했으며 개인적인 기호에 맞게 타입을 단언해주면 된다.
+
+```typescript
+// best common type
+let id = ''
+id = $('#foo').attr('id') || 'foo'
+// or
+let id: string | undefined
+id = $('#foo').attr('id')
+```
+
+사실 `DOM` 요소와 관련된 TypeScript 의 타입 추론이 마냥 틀리다고 볼 수 없는게 특
 
 ### Event
 
-```javascript
+```typescript
 $('#foo').on('click', (e: JQuery.Event) => {
   // ...
 })
@@ -284,19 +340,25 @@ $('#baz').on('click', function (this: HTMLElement, e: JQuery.Event) => {
 })
 ```
 
-이벤트 설정이 필요한 경우 이벤트 인자에 대한 타입은 `JQuery.Event`로 설정해주었다. 이벤트 타겟 요소의 타입 또한 타입의 인수로 지정해줄 수 있다. 콜백 함수에서 이벤트가 적용된 요소에 접근할 경우 `this` 객체에 타입을 설정해주었다.
+이벤트 설정이 필요한 경우 이벤트 인자에 대한 타입은 `JQuery.Event`로 설정해주었다. 이벤트 타겟 요소의 타입 또한 타입의 인수로 지정해줄 수 있다. 콜백 함수를 통해 이벤트가 적용된 요소에 접근할 경우 `this` 객체에 타입을 설정해주었다.
 
-### PlainObject
-
-```javascript
-class Foo {
-  constructor(props: { container: JQuery | string }) {
-    this.$el = $(container)
-  }
-}
-
-const foo1 = new Foo({ container: $('#foo') })
-const foo2 = new Foo({ container: '#foo' })
+```typescript
+document.querySelector('body').addEventListener('click', (e: Event) => {
+  // ...
+})
 ```
 
-클래스(또는 함수) 인자로 전달되는 경우
+`DOM` 에서 제공하는 기본 이벤트 타입의 경우 `Event` 타입을 지정해 주었다. JQuery를 통해 접근
+
+### interface
+
+```typescript
+export interface PropsJQuery extends JQuery {
+  props: {
+    isDisplayTotal?: boolean
+    isAlone?: boolean
+    callback?: (data: any) => void
+    defaultData?: SelectData
+  }
+}
+```
