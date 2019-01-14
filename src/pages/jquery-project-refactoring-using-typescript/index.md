@@ -9,7 +9,7 @@ tags: ['javascript', 'typescript']
 
 글을 최초 작성하는 2019년 1월 3일 기준으로 대략 3개월 전인 2018년 10월 16일 부터 현재 일하고 있는 회사의 JQuery 기반의 프로젝트를 TypeScript로 리펙토링하는 작업을 진행했다. 이제 막 그 작업을 완료했다고 생각해여 리펙토링 과정에서 느끼고 배웠던 내용들을 정리해보려 한다. 사실 회사에서 주어진 업무가 아니라 스스로 TypeScript를 공부하기 위한 방향으로 진행했기 때문에 개인적인 프로젝트라고 보는게 맞을지도 모르겠다.
 
-그래서 현재 회사에서 운영 중인 개발 환경 아직 TypeScript로 구현되어 있지 않다. 개인적인 학습 목표를 위해 진행한 내용이기도 하고 팀 내 다른 개발자 분들이 구현해 놓은 많은 양의 코드를 리펙토링 했기 때문에 이 전 코드와 기능 상 차이가 생길 수도 있고, 그럴 경우 운영 환경 배포 시 크리티컬한 이슈가 생길 수도 있다고 생각했다.
+그래서 현재 회사에서 운영 중인 개발 환경 역시 TypeScript로 구현되어 있지 않다. 개인적인 학습 목표를 위해 진행한 내용이기도 하고 팀 내 다른 개발자 분들이 구현해 놓은 많은 양의 코드를 리펙토링 했기 때문에 이 전 코드와 기능 상 차이가 생길 수도 있고, 그럴 경우 운영 환경 배포 시 크리티컬한 이슈가 생길 수도 있다고 생각했다.
 
 실제로 리펙토링 과정을 거치면서 TypeScript를 기준으로 봤을 때 다른 개발자분들이 미처 수정하지 못한 많은 오류들을 발견했고 그것들을 수정하면서 타입을 지정하는 걸 넘어선 코드의 변화가 일어나게 되었다. 다만 로컬환경에 확인한 바로는 정삭적으로 동작했기 때문에 실제 운영 환경에 적용되더라도 이상이 없을 것이라 개인적으로 생각하는 바이며, 이 후 운영 환경에 적용되게 된다며 관련 내용을 업데이트 하도록 하자.
 
@@ -31,7 +31,7 @@ tags: ['javascript', 'typescript']
 
 ## 기본 환경 설정
 
-우선 처음 작업을 진행한 날짜의 기준은 최초 프로젝트의 브랜치를 생성한 커밋 일자 기준이며, 그 전부터 회사 프로젝트를 리팩토링 해보고 싶었는데 다른 회사 업무나 개인적인 프로젝트 진행, 블로그 글 정리 등 때문에 늦어진 감이 있다. 그리고 무엇보다 TypeScript를 사용하기 위한 기본적인 환경 설정이 생각보다 오래 걸렸다. 대충 생각나는 기간만 2~3일 정도 걸렸던 것 같다.
+우선 처음 작업을 진행한 날짜의 기준은 최초 프로젝트의 브랜치를 생성한 커밋 일자 기준이며, 그 전부터 회사 프로젝트를 리팩토링 해보고 싶었는데 다른 회사 업무나 개인적인 프로젝트 진행, 블로그 글 정리 등 때문에 늦어진 감이 있다. 그리고 무엇보다 TypeScript를 사용하기 위한 기본적인 환경 설정이 생각보다 오래 걸렸다. 대충 생각나는 기간만 해도 2~3일 정도 걸렸던 것 같다.
 
 그래도 기본 환경 설정이 완료되고 나니 리팩토링 과정에 속도를 낼 수 있었다. 기본 환경 설징 더 늦었다면 작업 기간이 더 늘어났을 것 같다. 우선 TypeScript를 활용하기 위한 초기 기본 환경 설정에 대한 내용을 정리해보자.
 
@@ -207,7 +207,7 @@ typescript의 경우 컴파일 및 빌드 시 webpack 설정에 크게 의존적
 
 ### import, export
 
-기존 프로젝트의 경우 `commonjs` 방식의 문법을 사용하여 다른 모듈을 호출하거나 내보낼 때 `require`와 `module.exports` 문법으로 구현되어 있다. ES6에서는 `commonjs` 문법 맟 언어 내부적으로 `import`, `export` 구문 모두 지원되기 때문에 처음 프로젝트 진행 시 모듈을 호출하는 부분을 따로 수정하지 않았다.
+기존 프로젝트의 경우 `commonjs` 방식의 문법을 사용했으며 다른 모듈을 호출하거나 내보낼 때 `require`와 `module.exports` 문법으로 구현되어 있었다. ES6에서는 `commonjs` 문법 맟 언어 내부적으로 `import`, `export` 구문 모두 지원되기 때문에 처음 프로젝트 진행 시 모듈을 호출하는 부분을 따로 수정하지 않았다.
 
 기존 파일을 `.ts` 확장자로 변경했을때도 관련 문법의 오류는 확인되지 않아 별다른 생각없이 작업을 진행했다. 하지만 작업을 진행하면서 뭔가 이상하다는 생각이 들었다. 생각보다 리팩토링에 대한 작업량이 많지 않았기 때문이다. 파일 내부에서 사용되는 코드들의 타입의 경우 오류 확인이 가능했지만 `require` 로 호출된 외부 모듈의 경우 타입 확인을 하지 않는다는 생각이 들었다.
 
@@ -231,16 +231,20 @@ export default bar
 위와 같이 기존 코드의 모듈 호출 방식을 `import`, `export` 방식으로 변경해주었다. 이 후 관련된 문서를 확인해보니 `import` 및 `export` 로 모듈이 연결되었을때만 해당 모듈을 인식하는 것으로 확인했다.
 `require`를 통한 호출의 문제가 아니었기 때문에 해당 구문을 사용할 경우에도 `import` 선언을 통해 정상적인 동작을 확인할 수 있었다.
 
+- `foo.ts`
+
 ```typescript
-// foo.ts
 const $ = require('jquery')
 
 const foo = () => {}
 
 module.exports = foo
+```
 
-// bar.ts
-// error
+- `bar.ts`
+
+```typescript
+// error. 이미 선언의 전역 변수명 사용
 const $ = require('jquery')
 
 const bar = () => {}
@@ -250,7 +254,7 @@ module.exports = bar
 
 이 후 파일들을 수정하다 보니 파일에 `import`, `export` 구문이 없을 경우 전역 범위에서 사용되는 모듈로 인식되어 위와 같이 여러개의 모듈에서 동일한 이름의 변수룰 선언하는 경우 오류가 발생하는 것을 확인했다.
 
-앞서 설명드린 내용들은 아주 기초적인 내용이라 볼 수 있지만, 나의 경우 다른 개인적인 프로젝트에서 TypeScript를 사용할 때는 자연스럽게 `import`, `export` 구문을 활용하다보니 `commonjs` 방식에서 어떻게 동작하는지에 대한 인식이 없었던 것 같고, 이 번 작업을 통해 배웠다고 생각한다.
+앞서 설명한 내용들은 아주 기초적인 내용이라 볼 수 있지만, 나의 경우 다른 개인적인 프로젝트에서 TypeScript를 사용할 때는 자연스럽게 `import`, `export` 구문을 활용하다보니 `commonjs` 방식에서 어떻게 동작하는지에 대한 인식이 없었던 것 같고, 이 번 작업을 통해 배웠다고 생각한다.
 
 ### JQuery
 
@@ -321,7 +325,9 @@ let id: string | undefined
 id = $('#foo').attr('id')
 ```
 
-사실 `DOM` 요소와 관련된 TypeScript 의 타입 추론이 마냥 틀리다고 볼 수 없는게 접근하려는 요소의 무조건 존재한다고 볼 수 없으며, 만약 개발자가 인지하지 못하거나 실제로 존재하지 않는 요소에 접근하는 경우도 생길 수 있기 때문에
+`DOM` 요소와 관련된 TypeScript 의 타입 추론이 마냥 틀리다고 볼 수 없는게 접근하려는 요소가 무조건 존재한다고 볼 수 없기 때문이며 접근하려는 속성 또한 존재 여부를 알 수 없기 때문이다. 만약 개발자가 인지하지 못하는 상황에서 실제로 존재하지 않는 요소나 속성에 접근하는 경우에는 추론된 타입과 같이 `undefined`를 반환하기 때문이다. 그렇게 때문에 위와 같이 추론될 타입에 맞추어 타입을 선언해주거나 비교 연산을 통해 타입에 맞는 기본값을 지정해주도록 구현해주는 것이 좋다고 볼수 있을 것이다.
+
+실제 리팩토링 작업을 진행하면서 가장 많이 확인된 타입 에러 중 하나가 위와 같이 `DOM` 요소와 관련된 변수 타입 추론에 대한 오류였으며 전체 오류의 30% 이상을 차지하고 있었다. 해당 오류를 앞서 말한대로 일일히 코드 수정을 통해 타입을 맞춰주는 것이 좋겠지만 그러기에는 너무 많은 시간이 필요한 것도 사실이다. 그렇게 때문에 나 또한 코드의 흐름상이나 뷰 영역에서 예측 가능한 범위에서는 타입 단언을 활용했다.
 
 ### Event
 
@@ -333,7 +339,6 @@ $('#foo').on('click', (e: JQuery.Event) => {
 $('#bar').on('click', (e: JQuery.Event<HTMLElement>) => {
   // ...
 })
-
 
 $('#baz').on('click', function (this: HTMLElement, e: JQuery.Event) => {
   // ...
@@ -348,17 +353,247 @@ document.querySelector('body').addEventListener('click', (e: Event) => {
 })
 ```
 
-`DOM` 에서 제공하는 기본 이벤트 타입의 경우 `Event` 타입을 지정해 주었다. JQuery를 통해 접근
+`DOM` 에서 제공하는 기본 이벤트 타입의 경우 `Event` 타입을 지정해 주었다. 사실 `jquery` 이벤트 객체는 W3C 표준에 따라 기본 이벤트 객체를 표준화하기 때문에 `JQuery.Event` 대신 `Event` 타입을 사용해주어도 무방하다. 다만 나의 경우 `jquery`를 통한 이벤트 객체 타입을 구분해주기 위한 것도 있고, `Event` 타입 활용 시에 생길 수 있는 오류들도 감안하여 `JQuery.Event`를 사용하였다.
 
-### interface
+### Extending Interfaces & Global Variable
+
+브라우저 환경에서의 웹 프로젝트 진행 시에는 `window` 객체 또는 전역변수의 접근 및 수정이 필요한 경우도 있으며, JavaScript 또는 JQuery 에서 제공하는 내장 기능을 커스텀하게 변경해야 할 경우도 있다.
+
+나의 경우 앞서 말한 경우들이 리펙토링 과정에서 발견되었고 기본적으로 제공되는 타입을 활용해서는 해결할 수 없었기 때문에 `interface` 와 `extends` 문법을 활용하였다. JavaScript, JQuery 뿐만 아니라 특정 라이브러리 사용 시에는 경우에 따라 기본적으로 제공되어야 할 타입이 존재하지 않는 경우도 생겼기 때문에 특정 타입을 새롭게 만들어 주었다.
 
 ```typescript
-export interface PropsJQuery extends JQuery {
-  props: {
-    isDisplayTotal?: boolean
-    isAlone?: boolean
-    callback?: (data: any) => void
-    defaultData?: SelectData
+interface CustomWindow extends Window {
+  foo: () => void
+}
+
+window.foo = () => {}
+
+// error! 기본적인 window 객체에서는 해당 인스턴스를 찾을 수 없다.
+const foo = window.foo()
+
+// success
+const foo = (window as CustomWindow).foo()
+```
+
+위와 같이 `window` 객체 내 필요한 인스턴스를 선언하고 사용할 경우, 타입을 정의하지 않은 `window` 객체는 `Window` 타입으로 추론되며, `Window` 타입은 사용자가 재정의한 `foo` 라는 함수 타입의 인스턴스를 확인할 수 없다.
+
+앞서 말한 바와 같이 나의 경우 `Window` 객체를 상속받아 `foo`라는 인스턴스의 타입을 확인할 수 있는 `CustomWindow` 라는 새로운 타입을 만들어주었고, 타입 단언을 통해 `window` 객체가 `CustomWindow` 타입을 추론할 수 있도록 했다.
+
+```typescript
+declare global {
+  interface Window {
+    foo: () => void
   }
 }
+
+window.foo = () => {}
+
+// success
+const foo = window.foo()
 ```
+
+인터페이스를 확장하는 대신 `global` 객체를 통해 직접 `window` 객체의 타입을 지정해주는 것도 가능하다. 이럴 경우 타입 단언을 하지 않아도 정상적으로 새롭게 정의된 인스턴스를 확인할 수 있다. `window` 객체야말로 브라우저 환경에서 전역으로 사용되는 변수이기 때문에 `global` 객체를 통해 타입을 정의해주는게 더 편할 수도 있지만 다음과 같은 단점을 가지고 있다.
+
+- `foo.ts`
+
+```typescript
+declare global {
+  interface Window {
+    foo: () => void
+  }
+}
+
+const foo = window.foo()
+```
+
+- `bar.ts`
+
+```typescript
+// 전역 범위로 설정된 타입을 사용한다.
+const foo = window.foo()
+
+// error! 이미 정의된 전역 변수의 타입과 일치하지 않는다.
+window.foo = (value: string) => value
+```
+
+`global` 객체를 통해 정의된 `window` 객체는 파일별 모듈 영역을 넘어선 전역범위에 적용된다. `foo.ts` 에서 정의된 `window.foo` 타입은 `bar.ts` 라는 파일에서 접근하더라도 에러를 일으키지 않는다. 위와 같이 특정 파일에 재정의된 인스턴스의 타입이 전역으로 설정되었을때, 만약 `foo.ts` 파일의 `global` 타입이 수정되는 경우 해당 파일의 설정된 전역 변수에 접근하는 모든 파일에서 의도하지 않는 에러를 발생시킬 수 있다. 이는 특정 모듈에 종속적인 관계를 가지는 구조가 되기 때문에 개인적으로 위 방법은 선호하지 않았다.
+
+```typescript
+declare class ExternalClass {
+  // ...
+}
+
+const externalClass = new ExternalClass()
+
+declare const ExternalObject: {
+  test: () => void
+}
+
+ExternalObject.test()
+```
+
+또한 `window` 객체가 아니며, 모듈에서 호출되지 않은 브라우저 환경의 변수의 경우에는 해당 변수에 대한 타입을 `declare` 문법을 통해 직접 설정해주었다.
+
+```typescript
+interface WindowUsingBlob extends Window {
+  BlobBuilder: {
+    new (): MSBlobBuilder
+  }
+}
+
+new (window as WindowUsingBlob).BlobBuilder()
+
+interface JQueryUsingSelector extends JQuery {
+  selector: string
+}
+
+const selector = $('#foo' as JQueryUsingSelector).selector
+```
+
+`window` 객체뿐만 아니라, `jquery` 환경에서 제공되는 인스턴스의 타입이 확인되지 않는 경우 직접 해당 변수에 대한 타입을 만들어 주었다. 이렇게 기존 타입을 확장해주는 경우가 꽤 있었는데 내가 제대로 사용법을 숙지하고 사용한다는 기준으로 봤을때는 제대로 된 타입을 제공하지 않는 것 같아 조금 아쉽게 생각하는 부분이다. 여튼, 이렇게 특정 타입을 새롭게 만들어 주는 경우 실제로 해당 기능이 제공되지는 꼭 확인한 후 작업을 할 수 있도록 하자.
+
+### Generic
+
+앞서 타입 단언 시 제네릭 문법을 활용하는 내용을 잠깐 언급했다. 이번에는 실제 제네릭 문법을 활용해 클래스 또는 함수의 인자 타입을 정의한 내용을 정리했다.
+
+```typescript
+class Foo() {
+  constructor(container: string | HTMLElement | JQuery) {
+    // error! 두개 이상의 타입인 경우 JQuery.PlainObject 타입으로 인식되며 string 타입으로 접근할 수 없음.
+    const $el = $(container)
+  }
+}
+
+new Foo('#foo')    // string
+new Foo(document.querySelector('#foo')) // HTMLElement
+new Foo($('#foo')) // JQuery
+```
+
+`jquery`의 경우 `DOM`의 접근하기 위한 선택자 설정 시 `string` 타입 뿐만 아니라 `HTMLElement`, `JQuery` 타입의 객체로도 접근이 가능하다. 하지만 TypeScript 환경에서 해당 타입으로 접근할 경우 에러가 발생한다. 두개 이상의 타입으로 정의된 선택자를 통해 `JQuery` 객체 호출 시 `string` 타입으로 선택자를 받을 수 없다는 에러가 발생한다.
+
+이는 `@types/jquery` 에서 제공하는 `JQuery` 타입 내부의 오류일 수도 있고, 미처 내가 이해하지 못하는 타입 추론 로직이 있을 수도 있다. 사실 이러한 부분은 여러가지 의미로 `jquery` 뿐만 아니라 다른 라이브러리의 대한 타입 활용 시 생길 수 있는 문제라고 생각하며 TypeScript를 사용하는데 있어서 느끼는 단점 중 하나라고 생각한다.
+
+```typescript
+class Foo() {
+  constructor(container: JQuery.PlainObject) {
+    // success
+    const $el = $(container)
+  }
+}
+
+new Foo('#foo')    // string
+new Foo(document.querySelector('#foo')) // HTMLElement
+new Foo($('#foo')) // JQuery
+```
+
+위와 같이 여러 타입의 선택자를 사용할 경우 `JQuery.PlainObject`라는 타입으로 통해 에러를 처리할 수 있었다. 다만 이런 경우 어떠한 타입을 선택자를 넘겨주는지 눈으로 정확히 들어오지 않는 점이 마음에 들지 않았고 이러한 부분을 제네릭 문법을 활용하여 해결하였다.
+
+```typescript
+class Foo<container extends string | HTMLElement | JQuery>() {
+  constructor(container: container) {
+    // success
+    const $el = $(container as JQuery.PlainObject)
+  }
+}
+
+new Foo<string>('#foo')    // string
+new Foo<HTMLElement>(document.querySelector('#foo')) // HTMLElement
+new Foo<JQuery>($('#foo')) // JQuery
+```
+
+제네릭 문법을 통해 클래스 및 함수 호출 시 어떠한 인수 타입이 들어갈지 지정해주었으며 해당 모듈에는 인수가 어떠한 타입이 가지게 되는지 확인할 수 있도록 선언해주었다. 다만 해당 인수를 통해 `JQuery` 타입에 집근하는 경우 여전히 타입 에러가 발생하기 때문에 `JQuery.PlainObject` 타입으로 지정해주었다. 사실 선택자 접근과 관련된 타입 부분은 좀 더 확인이 필요한 부분이라 생각되면 나중에 기회가 된다면 관련 내용을 업데이트하자.
+
+## 리팩토링 결과
+
+최종적으로 리팩토링을 완료한 후, 리팩토링을 진행한 프로젝트의 파일 개수와 수정된 코드 및 검토가 필요한 영역에 남겨놓은 주석을 토대로 통계치를 정리했다.
+
+- 전체 파일 개수: 510개
+- 코드 수정이 일어났거나 검토가 필요한 영역에 대한 주석 개수: 1481개
+  - 타입 단언: 550개(37.1%)
+  - 정의되지 않은 변수 확인: 384개(25.9%)
+  - 변수 초기화 : 123개(8.3%)
+  - 타입 변경: 93개(6.2%)
+  - 사용하지 않는 변수: 57개(3.8%)
+  - 잘못된 인자 설정 : 52개(3.5%)
+  - 함수 반환 타입 설정: 48개(3.2%)
+  - 인터페이스 재정의: 47개(3.1%)
+  - any 타입 허용: 35개(2.3%)
+  - 잘못된 변수 및 함수 사용: 35개(2.3%)
+  - unknown 타입 사용: 27개(1.8%)
+  - 반환 값 수정: 20개(1.3%)
+  - 전역 변수 설정: 5개(0.3%)
+  - 여러개의 인자 타입 설정: 5개(0.3%)
+
+리팩토링 시 남겨놓은 주석을 토대로 가장 많은 검토가 필요한 종류부터 간단하게 해당 내용을 정리해보자
+
+### 타입 단언
+
+앞서 말한대로 `DOM` 영역에 대한 요소 및 속성에 접근할 경우 개발자가 미처 확인하지 못했던 타입을 추론하게 되어 에러를 발생시켰고 대부분의 경우 타입 단언을 통해 해결하였다. 타입 단언의 경우 실제 코드의 로직이 변경하는 경우는 아니지만, 경우에 따라 충분히 버그를 일으킬 수 있는 영역이기 때문에 이 후 추가적인 리팩토링 시 검토해봐야 할 부분이라 생각한다. 우선 타입 단언을 사용한 부분 중 눈여겨 볼만한 부분만 간략히 정리했다.
+
+```typescript
+const value = $('#foo').val() as string // string | string[] | number | undefined
+const width = $('#foo').width() as number // number | undefined
+const { top } = $('#foo').offset() as { top: number } // { top: number, left: number } | undefined
+```
+
+`input` 요소의 값을 가져오는 `val` 메서드의 반환 타입의 경우 요소의 종류에 따라 `string` 뿐만 아니라 `string[]`, `number`, `undefined` 타입을 반환하기 때문에 각 요소에 맞는 타입 단언을 해주거나 기본값을 지정해줄 수 있도록 하자.
+
+선택한 `DOM` 요소의 너비값을 반환하는 `width` 함수의 경우 기본적으로 `number` 타입을 반환하는 것으로 예상하지만 `undefined` 타입을 반환할 수도 있는 것으로 타입을 추론한다. 기본적으로 요소가 없을 경우도 있지만, 그렇지 않은 경우 스타일 또는 마크업의 구조적인 요소에 의한 것인지 정확히 파악하지 못했다. 이 외에도 `height`, `scrollTop`과 같은 함수에서도 `undefined` 타입을 추론한다.
+
+또한 `offset` 함수의 경우 `Coordinates` 또는 `undefined` 타입을 반환하게 된다. `Coordinates` 타입은 해당 요소의 좌표 정보를 가지는 객체로 대부분의 경우 `top` 과 `left` 인스턴스를 가지는 객체를 반환해 주지만 이 역시 해당 요소의 존재 여부에 따라 `undefined`를 반환해 줄 수 있다.
+
+```typescript
+const container = document.querySelector('#container') as HTMLElement // HTMLElement | null
+```
+
+`querySelector` 함수를 통해 요소에 접근하는 경우에도 해당 요소에 존재 여부에 따라 `null` 타입을 반한하기 때문에 해당 요소의 존재 여부가 확실한 상태에서 속성에 접근하려면 `HTMLElement` 타입을 지정해줘야한다.
+
+이처럼 대부분의 마크업 요소에 접근하는 경우 해당 요소의 존재 여부에 따라 `undefined` 또는 `null` 타입을 반환하기 때문에 이러한 요소에 접근 시에는 항상 정의되지 않은 타입을 반환하는 경우에 대한 조건 처리가 필요하다.
+
+```typescript
+let resizeTimer: WindowTimers | number
+
+resizeTimer = setTimeout(() => {}, 1000)
+
+clearTimeout(resizeTimer as number)
+```
+
+타어머 설정 시 사용하는 `setTimeout` 함수의 반환타입을 변수에 할당하는 경우 해당 변수는 `number` 타입의 값을 가지게 되지만 타입 추론 과정에서는 `WindowTimers` 라는 타입을 반환하게 된다. 그리고 변수에 할당된 값을 `clearTimeout` 함수인 인자로 넘겨줄때 `number` 타입의 인수로 단언하지 않는 경우 `WindowTimers` 타입을 넘겨주게 떼문에 타입 에러가 발생한다. 변수 선인 시 두 가지 타입을 할당받을 수 있도록 한뒤 `clearTimeout`의 인수로 넘겨줄때는 `number` 타입으로 단언해주었다.
+
+```typescript
+function foo(...args: any[]) {
+  if (args.length === 2) {
+    const params1 = args as [string, string]
+    // ...
+  } else {
+    const params2 = args as [number, string, string]
+    // ...
+  }
+}
+
+foo('1', '2')
+foo(1, '2', '3')
+```
+
+`spread` 문법을 활용해 인수를 전달받는 함수의 경우 인수 타입을 `any[]` 타입으로 설정해 주었고 특정 조건에 따라 함수의 인자 타입을 단언해줄 수 있도록 했다.
+
+```typescript
+$('#foo').on('click', (e: JQuery.Event) => {
+  const target = e.target as EventTarget
+  const id = (e.target as HTMLElement).attr('id')
+  const code = e.keyCode as number
+})
+```
+
+이벤트 객체 접근 시 이벤트 타겟이 접근할 경우 `null` 타입을 추론하기 때문에 `EventTarget` 타입으로 단언해주었다. `target` 요소에서 해당 요소의 속성에 접근하는 경우에는 `HTMLElement` 타입을 단언하여 각 속성에 접근할 수 있도록 한다. 키 코드를 확인하는 경우에도 `undefined` 타입을 추론할 수 있기 때문에 `number` 타입으로 단언해 주었다.
+
+```typescript
+const regex = /foo/g
+const result = 'foo'.match(regex) as RegExpMatchArray
+```
+
+특정 문자열을 패턴에 따른 매칭값을 찾기 위해 `match` 함수를 활용하는 경우에도 `null` 타입을 추론할 수 있기 때문에 `RegExpMatchArray` 타입으로 단언해주었다.
+
+### 정의되지 않은 변수 확인
+
+정의되지 않은 변수란 변수의 타입이 `null` 또는 `undefined` 를 가질 수 있는 변수를 말하며, 이러한 변수들을 확인되지 않은 상태에서 해당 변수 또는 변수의 인스턴스에 접근하는 경우 타입 에러를 발생한다. 그렇기 때문에 정의되지 않은 변수에 접근하기 전 조건 처리를 통해 변수의 사용 여부를 정해주도록 하였다.
