@@ -596,4 +596,22 @@ const result = 'foo'.match(regex) as RegExpMatchArray
 
 ### 정의되지 않은 변수 확인
 
-정의되지 않은 변수란 변수의 타입이 `null` 또는 `undefined` 를 가질 수 있는 변수를 말하며, 이러한 변수들을 확인되지 않은 상태에서 해당 변수 또는 변수의 인스턴스에 접근하는 경우 타입 에러를 발생한다. 그렇기 때문에 정의되지 않은 변수에 접근하기 전 조건 처리를 통해 변수의 사용 여부를 정해주도록 하였다.
+정의되지 않은 변수란 변수의 타입이 `null` 또는 `undefined` 를 가질 수 있는 변수를 말하며, 이러한 변수들을 확인되지 않은 상태에서 해당 변수를 다른 타입의 형식에 맞게 경우 타입 에러를 발생한다. 그렇기 때문에 정의되지 않은 변수에 접근하기 전 조건 처리를 통해 변수의 사용 여부를 정해주도록 했다.
+
+```typescript
+class Foo {
+  init() {
+    this.$container = $('foo')
+  }
+
+  html() {
+    console.log(this.$container.html())
+  }
+}
+
+const foo = new Foo()
+foo.init()
+foo.html()
+```
+
+위와 같은 `Foo` 클래스가 있고 해당 클래스를 호출한뒤 `init`, `test` 함수를 차려대로 실행한다고 가정해보자. 일반적인 경우
