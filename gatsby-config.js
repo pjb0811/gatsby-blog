@@ -28,6 +28,7 @@ module.exports = {
     {
       resolve: 'gatsby-transformer-remark',
       options: {
+        excerpt_separator: '<!-- end -->',
         plugins: [
           {
             resolve: 'gatsby-remark-images',
@@ -108,7 +109,7 @@ module.exports = {
               }
             `,
             output: SITE_CONFIG.siteRss,
-            title: SITE_CONFIG.title
+            title: SITE_CONFIG.title,
           },
         ],
       },
