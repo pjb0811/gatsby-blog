@@ -1,11 +1,11 @@
 ---
 title: TypeScript를 활용한 JQuery 프로젝트 리팩토링 - 2부
 date: '2019-01-14'
-mainImage: './refactoring-ts.png'
+mainImage: './refactoring.jpg'
 tags: ['javascript', 'typescript']
 ---
 
-> TypeScript를 활용한 사내 프로젝트의 리팩토링을 진행하면서 겪은 타입 에러의 종류과 그걸 해결하는 과정에 대한 내용으로 글을 정리했다. 생각보다 글 내용이 길어져 하나의 페이지에서 작성하려고 한 내용을 두개의 파트로 나누어셔 설명했기 때문에 기본적인 환경 설정 및 리팩토링 과정에서 특별히 배웠던 내용들은 이 전 글을 참고하면 된다.<!-- end --> 다른 사람에게 설명하기 보다는 스스로의 학습 내용을 정리하는 글이기 때문에 편한 말투로 작성했다.
+> TypeScript를 활용한 사내 프로젝트의 리팩토링을 진행하면서 겪은 타입 에러의 종류과 그걸 해결하는 과정에 대한 내용으로 글을 정리했다. 생각보다 글 내용이 길어져 하나의 페이지에서 작성하려고 한 내용을 두개의 파트로 나누어셔 설명했기 때문에 기본적인 환경 설정 및 리팩토링 과정에서 특별히 배웠던 내용들은 이 전 글을 참고하면 된다. 다른 사람에게 설명하기 보다는 스스로의 학습 내용을 정리하는 글이기 때문에 편한 말투로 작성했다.
 
 ## 리팩토링 결과
 
@@ -28,7 +28,7 @@ tags: ['javascript', 'typescript']
   - 전역 변수 설정: 5개(0.3%)
   - 여러개의 인자 타입 설정: 5개(0.3%)
 
-주석의 내용대로 리팩토링 과정에서 확인된 타입 에러가 정확히 일치한다고 볼 수 없지만 최대한 같은 경우에 대한 타입 에러 별로 주석을 남겨 통계치를 냈다. 이제 리팩토링 시 남겨놓은 주석을 토대로 가장 많은 검토가 필요한 종류부터 간단하게 해당 내용을 정리해보자
+주석의 내용대로 리팩토링 과정에서 확인된 타입 에러가 정확히 일치한다고 볼 수 없지만 최대한 같은 경우에 대한 타입 에러 별로 주석을 남겨 통계치를 냈다. 이제 리팩토링 시 남겨놓은 주석을 토대로 가장 많은 검토가 필요한 종류부터 간단하게 해당 내용을 정리해보자.
 
 ### 타입 단언
 
@@ -438,19 +438,92 @@ const foo = (str = '') => {
     return {}
   }
 
-  return JSON.parse(str)
+  return {
+    [str]: str,
+  }
 }
 
-const bar = foo()
-const baz = foo('')
-
-bar.{"a": 0}
-
+console.log(foo('a').a) // error! 객체 프로퍼티 확인할 수 없음
+console.log(foo('b').b) // error! 객체 프로퍼티 확인할 수 없음
 ```
+
+위와 같이 인자 사용 여부에 따라 반환 객체의 프로퍼티를 설정해 주는 함수가 있다. 함수 호출 시 인자를 설정해 준 뒤 반환된 객체의 프로퍼터에 접근하고 싶지만 타입 에러가 발생한다. 반환 타입을 일반 객체로만 추론하기 때문에 객체 내 프로퍼티를 확인할 수 없다.
+
+```typescript
+const foo = (str = ''): { [name: string]: string } => {
+  if (!str) {
+    return {}
+  }
+
+  return {
+    [str]: str,
+  }
+}
+
+console.log(foo('a').a) // success
+console.log(foo('b').b) // success
+```
+
+반환 타입을 인덱스 시그니처 문법을 활용하여 프로퍼티가 설정된 객체를 반환할 수 있도록 해주었다.
 
 ### 인터페이스 재정의
 
+이 전 파트에서 인터페이스 확장을 통해 `Window`, `JQuery` 타입을 재정의하는 방법에 대해 설명했다. `Window`, `JQuery` 타입뿐만 아니라 TypeScript에서 추론하지 못한 타입에 대하여 인터페이스를 재정의한 내용을 정리했다.
+
+```typescript
+interface FileReaderEventTarget extends EventTarget {
+  result: string
+}
+
+const reader = new FileReader()
+
+reader.onload = e => {
+  const result = (e.target as FileReaderEventTarget).result
+  // ...
+}
+```
+
+`FileReader` 객체의 인스턴스 생성 후 `onload` 이벤트 타겟을 활용하는 코드이다. 일반적인 이벤트 타겟의 경우 `EventTarget` 타입을 추론하는데 해당 타입의 경우 `result` 프로퍼티를 확인할 수 없기 떄문에 해당 타입에 대한 프로퍼티를 재정의했다
+
+```typescript
+interface DatasetEventTarget extends EventTarget {
+  dataset: DOMStringMap
+}
+
+$('#foo').on('click', (e: JQuery.Event) => {
+  const { a, b, c } = (e.target as DatasetEventTarget).dataset
+  // ...
+})
+```
+
+마크업 요소의 이벤트 설정 시 이벤트 타겟의 `dataset` 속성을 활용하는 코드이다. `EventTarget`의 경우 `dataset` 프로퍼티에 대한 타입을 확인할 수 없어 해당 타입에 대한 프로퍼티를 재정의했다. `dataset` 프로퍼티의 경우 `DOMStringMap` 타입으로 정의하여 커스텀 데이터 속성으로 인식할 수 있게 설정해주었다.
+
+```typescript
+interface TouchEvent extends Event {
+  touches: { pageX: number; pageY: number }[]
+}
+
+$('#foo').on('touchstart', (e: JQuery.Event) => {
+  const { pageX, pageY } = (e.originalEvent as TouchEvent).touches[0]
+  // ...
+})
+```
+
+마크업 요소의 `touchstart` 이벤트를 활용하는 코드이다. `originalEvent` 프로퍼티의 경우 터치 정보와 관련된 타입을 확인할 수 없었기 때문에 타입을 재정의해서 사용했다.
+
 ### any 타입 허용
+
+코드의 특정한 구조 또는 확인하지 못한 타입의 경우 `any` 타입을 활용하였다. 최대한 모든 타입을 확인하려고 했지만 그러지 못한 부분들이 있었고, 어떠한 경우가 있었는지에 대한 내용을 정리했다.
+
+```typescript
+function foo(callback: (params: any) => any) {
+  return callback(something)
+}
+```
+
+가장 많은 부분에서 `any` 타입을 활용한 예는 콜백 함수의 인자 또는 반환 값에 대한 타입이다. 콜백 함수의 인자의 경우, 비동기 응답 데이터의 따라 타입 지정이 가능한 경우도 있었지만 반환 타입의 경우 콜백 함수가 활용된 코드를 전부 확인할 수 없었기 때문에 `any` 타입으로 지정해주었다.
+
+사실 일부 코드의 경우 실제로 반환값을 활용하지 않거나 예측 가능한 범위에서 반환값에 대한 타입을 지정해줄 수 있었지만 미처 파악하지 못한 코드가 있거나, 아니면 파악하지 못한 구현상의 이유가 있을수 있다고 생각해서 값을 반환하는 콜백함수의 경우에는 대부분 `any` 타입을 허용했다.
 
 ### 잘못된 변수 및 함수 사용
 

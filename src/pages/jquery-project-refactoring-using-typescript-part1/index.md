@@ -353,7 +353,7 @@ document.querySelector('body').addEventListener('click', (e: Event) => {
 })
 ```
 
-`DOM` 에서 제공하는 기본 이벤트 타입의 경우 `Event` 타입을 지정해 주었다. 사실 `jquery` 이벤트 객체는 W3C 표준에 따라 기본 이벤트 객체를 표준화하기 때문에 `JQuery.Event` 대신 `Event` 타입을 사용해주어도 무방하다. 다만 나의 경우 `jquery`를 통한 이벤트 객체 타입을 구분해주기 위한 것도 있고, `Event` 타입 활용 시에 생길 수 있는 오류들도 감안하여 `JQuery.Event`를 사용하였다.
+`jquery` 이벤트 객체는 W3C 표준에 따라 브라우저별로 이벤트 객체를 표준화하기 때문에 `JQuery.Event` 타입을 활용해야하며, 기본 이벤트 객체의 경우에는 `Event` 타입을 지정해 주었다.
 
 ### Extending Interfaces & Global Variable
 
