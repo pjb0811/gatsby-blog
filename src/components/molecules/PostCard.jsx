@@ -20,7 +20,6 @@ class PostCard extends Component {
   render() {
     const { node, classes } = this.props
     const { title, mainImage, tags } = node.frontmatter
-    console.log(node)
 
     return (
       <Grid item xs={12}>
