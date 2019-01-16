@@ -82,7 +82,10 @@ module.exports = {
                   title: edge.node.frontmatter.title,
                   url: site.siteMetadata.siteUrl + edge.node.fields.slug,
                   guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
-                  custom_elements: [{ 'content:encoded': edge.node.html }],
+                  custom_elements: [
+                    { 'content:encoded': edge.node.excerpt },
+                    { 'content:encoded': edge.node.html },
+                  ],
                 })
               })
             },
@@ -90,8 +93,7 @@ module.exports = {
               {
                 allMarkdownRemark(
                   limit: 1000,
-                  sort: { order: DESC, fields: [frontmatter___date] },
-                  filter: {frontmatter: { draft: { ne: true } }}
+                  sort: { order: DESC, fields: [frontmatter___date] }
                 ) {
                   edges {
                     node {
