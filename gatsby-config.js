@@ -83,8 +83,12 @@ module.exports = {
                   url: site.siteMetadata.siteUrl + edge.node.fields.slug,
                   guid: site.siteMetadata.siteUrl + edge.node.fields.slug,
                   custom_elements: [
-                    { 'content:encoded': edge.node.excerpt },
-                    { 'content:encoded': edge.node.html },
+                    {
+                      'content:encoded': edge.node.html.replace(
+                        /[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/gu,
+                        ''
+                      ),
+                    },
                   ],
                 })
               })
