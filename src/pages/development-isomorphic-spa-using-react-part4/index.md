@@ -167,7 +167,7 @@ class Posts extends Component {
     super(props)
     const { staticContext } = this.props
     this.state = {
-      data: staticContext ? staticContext.data : {},
+      data: staticContext ? staticContext.data : null,
     }
   }
 
@@ -235,7 +235,7 @@ class Posts extends Component {
     super(props)
     const { staticContext } = this.props
     this.state = {
-      data: staticContext ? staticContext.data : {},
+      data: staticContext ? staticContext.data : null,
     }
   }
 
@@ -268,4 +268,4 @@ class Posts extends Component {
 
 ## 다음 과제
 
-지금까지 SPA 개발환경에서 비동기 데이터를 처리하는 방법에 대한 내용들을 정리했다. 다음은 전역 상태 관리 라이브러리(`redux-thunk`, `redux-saga`, `mobx`)를 SPA 환경에서 활용하는 방법에 대한 내용을 정리하고자 한다.
+지금까지 SPA 개발환경에서 비동기 데이터를 처리하는 방법에 대한 내용들을 정리했다. 다음은 전역 상태 관리 라이브러리(`redux`, `mobx`)를 SPA 환경에서 활용하는 방법에 대한 내용을 정리하고자 한다.
