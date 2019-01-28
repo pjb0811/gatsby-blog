@@ -237,7 +237,7 @@ const renderer = async ({ req, html }) => {
 module.exports = renderer
 ```
 
-이 전에 클라이언트 영역에서 구현했던 것처럼 서버측에서도 `Provider` 컴포넌트를 통해 `store` 로터 전달받은 상태 괸리 객체를 최상위 컴포넌트인 `App`에 전달하도록 했다. 서버 측에서 필요한 구현은 끝났으니 실행 결과를 확인해보자.
+이 전에 클라이언트 영역에서 구현했던 것처럼 서버측에서도 `Provider` 컴포넌트를 통해 `store` 로터 전달받은 상태 관리 객체를 최상위 컴포넌트인 `App`에 전달하도록 했다. 서버 측에서 필요한 구현은 끝났으니 실행 결과를 확인해보자.
 
 ![redux-server-src](redux-server-src.png)
 
@@ -335,13 +335,308 @@ export default handleActions(
 )
 ```
 
-비동기 요청 시 반환 상태에 따른 `loading`, `success`, `error`라는 `action`을 생성했다.
+비동기 요청 시 반환 상태에 따른 `loading`, `success`, `error`라는 `action`을 생성했다. 비동기 데이터 요청 시 반환되는 `pending`, `resolve`, `reject` 상태에 따라 각 액션을 호출하도록 구현했다. 다만 비동기 요청 시 반환 상태에 따라 `dispatch` 함수를 통해 일일히 `action`을 요청해야 하기 때문에 기존에 사용했던 비동기 요청 함수를 사용하지 못하는 부분이 조금 아쉽다.
 
-또한 비동기 데이터 요청 시 `pending`, `resolve`, `reject` 의 반환 상태를 가지게 되는게 이렇게 반환 결과에 따른 `action` 호출을 쉽게
+다행히도 이러한 비동기 상태에 따라 액션을 자동으로 생성히 주는 라이브러리가 있어 이를 활용했다. `redux-promise-middleware`라는 미들웨어를 활용하여 코드를 개선해보자.
+
+우선 라이브러리를 사용하기 위해 설치부터 진행하도록 하자.
+
+```bash
+yarn add --dev redux-promise-middleware
+```
+
+설치한 미들웨어를 사용하기 위해 `store` 파일에 수정하도록 하자.
+
+- `src/redux/store.js`
+
+```javascript
+import { createStore, applyMiddleware } from 'redux'
+import reducers from './reducers'
+import ReduxThunk from 'redux-thunk'
+import promiseMiddleware from 'redux-promise-middleware'
+
+export default () => {
+  return createStore(
+    reducers,
+    applyMiddleware(
+      ReduxThunk,
+      promiseMiddleware({
+        promiseTypeSuffixes: ['LOADING', 'SUCCESS', 'ERROR'],
+      })
+    )
+  )
+}
+```
+
+`applyMiddleware` 함수 호출 시 해당 미들웨어를 사용하도록 `promiseMiddleware` 함수의 반환 값을 인자에 추가했다. `promiseMiddleware`의 인자로는 액션 생성 시 연결할 문자열을 옵션으로 추가했다. 이를 통해 비동기 요청 상태에 따라 `_LOADING`, `_SUCCESS`, `_ERROR`라는 접미사가 추가된 액션이 생성하도록 설정했다.
+
+이제 이 전에 구현했던 비동기 요청을 통해 액션을 요청하는 영역을 수정해보자.
+
+- `src/redux/reducers/post.js`
+
+```javascript
+import { handleActions, createAction } from 'redux-actions'
+import loadData from '../../lib/loadData'
+
+const GET_POST = 'GET_POST'
+const GET_POST_LOADING = 'GET_POST_LOADING'
+const GET_POST_SUCCESS = 'GET_POST_SUCCESS'
+const GET_POST_ERROR = 'GET_POST_ERROR'
+
+export const getPost = createAction(
+  GET_POST,
+  async path => await loadData(path)
+)
+
+// ...
+```
+
+반환 상태에 따라 `createAction` 함수를 통해 생성한 액션 함수를 비동기 요청 시 직접 호출하지 않도록 수정했다. `GET_POST`라는 액션 생성 시 미들웨어를 통해 비동기 요청 상태에 따라 액션을 자동으로 생성하도록 요청했고 이를 통해 기존의 `loadData` 함수를 사용할 수 있도록 수정했다.
+
+그럼 이제 구현한 `reducer`를 `store`에 전달하도록 하자.
+
+- `src/redux/reducer/index.js`
+
+```javascript
+import { combineReducers } from 'redux'
+import counter from './counter'
+import post from './post'
+
+export default combineReducers({
+  counter,
+  post,
+})
+```
+
+새롭게 구현한 `post reducer`를 `store`에 주입하도록 설정했다. 이제 비동기 데이터를 활용하기 위해 컴포넌트 영역을 수정하도록 하자.
 
 ### Clinet
 
+`redux-thunk`를 통한 비동기 데이터를 활용하기 위해 기존에 사용했던 `Posts` 컴포넌트를 수정했다.
+
+- `src/components/Posts.jsx`
+
+```javascript
+import React, { Component } from 'react'
+import withLayout from './withLayout'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import * as postActions from '../redux/reducers/post'
+
+class Posts extends Component {
+  componentDidMount() {
+    const { PostActions, match } = this.props
+    PostActions.getPost(match.url)
+  }
+
+  render() {
+    const { post } = this.props
+
+    return (
+      <div>
+        {post.loading && '...loading'}
+        {post.error && 'error!'}
+        {post.data.map((item, i) => (
+          <div key={i}>{item.title}</div>
+        ))}
+      </div>
+    )
+  }
+}
+
+export default connect(
+  state => ({
+    post: state.post,
+  }),
+  dispatch => ({
+    PostActions: bindActionCreators(postActions, dispatch),
+  })
+)(withLayout(Posts))
+```
+
+우선 라우터를 통해 비동기 데이터를 활용하기 위해 구현했던 이 전 코드는 지우고 `redux-thunk`를 활용하기 위해 수정된 코드의 내용이다. `Counter` 컴포넌트를 구현할때와 마찬가지로 `connect` 함수를 통해 전역 상태와 `action` 함수를 전달받도록 수정했다. 이 후 `componentDidMount` 함수 호출 시 라우팅 정보에 따른 `action` 호출을 통해 비동기 데이터를 전달받도록 수정했다. 렌더링 시에는 요청 상태에 따른 화면 구성을 구분할 수 있도록 구현했다. 그럼 이제 해당 코드가 잘 동작하는지 확인해보자.
+
+![redux-thunk-client](./redux-thunk-client.gif)
+
+컴포넌트 렌더링 시 비동기적인 액션 호출을 통해 정상적으로 비동기 데이터를 전달받는 것을 확인했다.
+
 ### Server
+
+이제 서버에서 비동기 데이터를 정상적으로 렌더링할 수 있도록 작업을 진행해보자. 우선 서버 측에서 라우터 주소에 따라 `action`을 호출하기 위한 작업이 필요하다.
+
+```javascript
+// ...
+import store from '../redux/store'
+import * as postActions from '../redux/reducers/post'
+
+// ...
+
+const initStore = store()
+
+const Routes = [
+  // ...
+  {
+    path: '/posts/:id',
+    component: Loadable({
+      loader: () => import('../components/Posts'),
+      loading,
+    }),
+    loadData: async path => {
+      await initStore.dispatch(postActions.getPost(path))
+      return initStore.getState()
+    },
+  },
+  {
+    path: '/posts',
+    component: Loadable({
+      loader: () => import('../components/Posts'),
+      loading,
+    }),
+    loadData: async path => {
+      await initStore.dispatch(postActions.getPost(path))
+      return initStore.getState()
+    },
+  },
+  // ...
+]
+
+export default Routes
+```
+
+기존 `loadData` 함수에서 비동기 요청에 대한 응답 데이터를 반환하지 않고 `store`를 생성한 뒤 해당 라우터 주소에 따라 새로운 전역 상태에 대한 데이터를 반환하도록 수정했다.
+
+- `src/lib/renderer.js`
+
+```javascript
+// ...
+import { Provider } from 'react-redux'
+import store from '../redux/store'
+
+const renderer = async ({ req, html }) => {
+  const currentRoute = routes.find(route => matchPath(req.url, route)) || {}
+  const initState = currentRoute.loadData
+    ? await currentRoute.loadData(req.url)
+    : {}
+  const initStore = store(initState)
+
+  const context = {}
+  let modules = []
+
+  const app = renderToString(
+    <Loadable.Capture report={moduleName => modules.push(moduleName)}>
+      <StaticRouter location={req.url} context={context}>
+        <Provider store={initStore}>
+          <App />
+        </Provider>
+      </StaticRouter>
+    </Loadable.Capture>
+  )
+
+  let bundles = getBundles(stats, modules)
+
+  return {
+    html: html.replace(
+      '<div id="root"></div>',
+      `<div id="root">${app}</div>
+      <script>window.__INIT_DATA__ = ${serialize(initStore.getState())}</script>
+      ${bundles
+        .filter(bundle => !bundle.file.includes('.map'))
+        .map(bundle => `<script src="${bundle.publicPath}"></script>`)
+        .join('\n')}
+      `
+    ),
+    context,
+  }
+}
+
+module.exports = renderer
+```
+
+서버 측 비동기 데이터 설정 시 기존에는 컴포넌트에 설정한 `loadData` 함수 요청 후 반환되는 비동기 데이터를 `context` 객체의 프로퍼티로 설정한 뒤 `StaticRouter`의 props로 전달해 주었다. 현재는 비동기 데이터를 포함한 전역 데이터를 새로운 `store` 함수 호출에 필요한 인자값으로 넘겨주고 있다. 이 후 새롭게 생성된 상태 객체를 `Provider` 컴포넌트이 props로 전달하도록 수정했다. 이 후 클라이언트에서 확인하기 위한 초기 전역 데이터 또한 `window.__INIT_DATA__`라는 새로운 객체를 통해 클라이언트에서 전달받을 수 있도록 수정했다.
+
+다만 기존에 구현된 `store` 생성함수는 초기 데이터값에 대한 인자를 따로 받지 않았기 때문에 `store` 생성 시 초기 전역 데이터를 전달받을 수 있도록 수정해야 하며 서버 렌더링 이후 클라이언트 렌더링 시에도 초기 전역 데이터를 전달받기 위한 수정이 필요하다.
+
+- `src/redux/store.js`
+
+```javascript
+import { createStore, applyMiddleware } from 'redux'
+import reducers from './reducers'
+import ReduxThunk from 'redux-thunk'
+import promiseMiddleware from 'redux-promise-middleware'
+
+export default (initialState = {}) => {
+  return createStore(
+    reducers,
+    initialState,
+    applyMiddleware(
+      ReduxThunk,
+      promiseMiddleware({
+        promiseTypeSuffixes: ['LOADING', 'SUCCESS', 'ERROR'],
+      })
+    )
+  )
+}
+```
+
+기존 함수 호출 시 비어있던 인자를 `initialState`라는 초기 전역 데이터를 갖는 인자로 수정했다. 이 후 함수 호출 시 전달받은 초기 전역 데이터를 `createStore` 함수의 인자로 추가했다.
+
+- `src/index.js`
+
+```javascript
+// ...
+ReactDOM.render(
+  <BrowserRouter>
+    <Provider store={store(window.__INIT_DATA__ || {})}>
+      <App />
+    </Provider>
+  </BrowserRouter>,
+  document.getElementById('root')
+)
+
+// ...
+```
+
+서버 렌더링 이후 요청되는 클라이언트 측 `store` 생성 함수의 인자로 서버에서 설정한 `window.__INIT_DATA__` 객체를 인수로 전달할 수 있도록 수정했다. 이를 통하 최초 서버 렌더링 이후 클라이언트 렌더링 시 서버에서 전달받은 초기 데이터를 통해 `store` 함수를 호출할 수 있다. 이제 서버 렌더링 이 후 추가적인 라우터 호출 시 컴포넌트 영역에서 `window.__INIT_DATA__` 객체 존재 여부에 따라 액션 호출 조건만 수정하면 된다.
+
+- `src/components/Counter.jsx`
+
+```javascript
+class Counter extends Component {
+  // ...
+
+  componentDidMount() {
+    if (window.__INIT_DATA__) {
+      window.__INIT_DATA__ = null
+    }
+  }
+
+  // ...
+}
+```
+
+`Counter` 컴포넌트에서 `componentDidMount` 함수 호출 시 `window.__INIT_DATA__` 객체가 존재할 경우 해당 객체를 비워주도록 설정했다. 최초 서버 렌더링 이후 클라이언트 영역에서 해당 객체를 참조하지 않기 위해서다
+
+- `src/components/Posts.jsx`
+
+```javascript
+class Posts extends Component {
+  // ...
+
+  componentDidMount() {
+    const { PostActions, match } = this.props
+
+    if (window.__INIT_DATA__) {
+      window.__INIT_DATA__ = null
+    } else {
+      PostActions.getPost(match.url)
+    }
+  }
+
+  // ...
+}
+```
+
+`Posts` 컴포넌트 또한 `componentDidMount` 함수 호출 시 `window.__INIT_DATA__` 객체가 존재할 경우 해당 객체를 비워주도록 설정했다. 역시 최초 렌더링 이후 클라이언트 영역에서 컴포넌트 재호출 시에는 새롭게 액션 함수 호출을 통해 전역 상태를 갱신할 수 있도록 수정했다.
 
 ## redux-saga
 
