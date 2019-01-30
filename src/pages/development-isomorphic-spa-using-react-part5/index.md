@@ -410,7 +410,7 @@ export default combineReducers({
 
 새롭게 구현한 `post reducer`를 `store`에 주입하도록 설정했다. 이제 비동기 데이터를 활용하기 위해 컴포넌트 영역을 수정하도록 하자.
 
-### Clinet
+### Client
 
 `redux-thunk`를 통한 비동기 데이터를 활용하기 위해 기존에 사용했던 `Posts` 컴포넌트를 수정했다.
 
@@ -636,11 +636,91 @@ class Posts extends Component {
 }
 ```
 
-`Posts` 컴포넌트 또한 `componentDidMount` 함수 호출 시 `window.__INIT_DATA__` 객체가 존재할 경우 해당 객체를 비워주도록 설정했다. 역시 최초 렌더링 이후 클라이언트 영역에서 컴포넌트 재호출 시에는 새롭게 액션 함수 호출을 통해 전역 상태를 갱신할 수 있도록 수정했다.
+`Posts` 컴포넌트 또한 `componentDidMount` 함수 호출 시 `window.__INIT_DATA__` 객체가 존재할 경우 해당 객체를 비워주도록 설정했다. 서버 렌더링 이후 클라이언트 영역에서 컴포넌트 재호출 시에는 새롭게 액션 함수 호출을 통해 전역 상태를 갱신할 수 있도록 수정했다.
+
+이제 서버 설정을 완료했으니 서버 실행 후 페이지 소스를 확인해보자.
+
+![redux-thunk-server-src](./redux-thunk-server-src.png)
+
+`Posts` 컴포넌트 호출 시 서버 측에서 초기 전역 데이터를 정상적으로 렌더링하는 것을 확인할 수 있다. 이 후 클라이언트 렌더링 또한 이상없이 동작하는 것을 확인할 수 있다.
 
 ## redux-saga
 
-### Clinet
+![redux-saga](./redux-saga.png)
+
+`redux-saga`는 앞서 설명한 `redux-thunk`와 같이 `redux`에서 비동기 데이터를 활용할 수 있도록 도와주는 라이브러리이다. `redux-thunk`와 다른 점은 `redux`를 통해 생성한 `action`의 `side effect`를 생성하는 별도의 `task`를 활용한다고 볼 수 있다. 해당 `task`를 통해 동기적인 `action`을 비동기적으로 호출해줄 수 있다.
+
+`redux-thunk` 를 사용할때는 `action` 호출의 반환 상태를 객체 대신 함수로 변경한 뒤 비동기 요청 상태에 따라 다른 `action`을 호출해 주었다. 비동기 상태에 따라 `action` 을 호출하다 보면 결국 호출이 여러 단계로 중첩될 수 있으며, 이는 비동기 데이터 처리 로직이 복잡해질수록 중첩된 `action` 호출에 의한 전역 상태의 디버깅 및 테스트가 어려워지게 된다.
+
+`redux-saga`는 동기적인 `action`의 `side effect`를 통해 액션 호출을 비동기적으로 제어할 수 있기 떼문에, `action` 자체가 가지고 있는 본연의 기능을 사용할 수 있으며 상태의 흐름 쉽게 파악할 수 있기 때문에 전역 상태를 관리하는 입장에서 `redux-thunk` 보다 장점을 가지고 있다.
+
+다만 비동기 액션 처리 시 `es6`의 `generator` 문법을 활용하며, `redux-saga`에서 제공하는 여러 기능의 사용법들은 사용자에 따라 높은 러닝커브를 요구하기도 한다. 나 역시 그 중 한명으로써 익숙하지 않은 `generator` 문법과 기본적인 활용법에 대해 아직 이해하지 못하는 부분이 많다.
+
+그래도 내가 이해하는 범위 내에서 `redux-saga`를 활용한 내용을 정리했다.
+
+### Client
+
+우선 `redux-saga`를 설치하고 `action` 을 생성하는 부분을 수정한다.
+
+```bash
+yarn add --dev redux-saga
+```
+
+- `src/redux/reducers/post.js`
+
+```javascript
+import { handleActions, createAction } from 'redux-actions'
+
+export const GET_POST = 'GET_POST'
+export const GET_POST_SUCCESS = 'GET_POST_SUCCESS'
+export const GET_POST_ERROR = 'GET_POST_ERROR'
+
+export const getPost = createAction(GET_POST)
+
+const initialState = {
+  loading: false,
+  error: false,
+  data: [],
+}
+
+export default handleActions(
+  {
+    [GET_POST]: () => {
+      return {
+        loading: true,
+        error: false,
+        data: [],
+      }
+    },
+
+    [GET_POST_SUCCESS]: (_, action) => {
+      let { data } = action.payload
+
+      if (!Array.isArray(data)) {
+        data = [data]
+      }
+
+      return {
+        loading: false,
+        error: false,
+        data,
+      }
+    },
+    [GET_POST_ERROR]: () => {
+      return {
+        loading: false,
+        error: true,
+        data: [],
+      }
+    },
+  },
+  initialState
+)
+
+// ...
+```
+
+이 전에 `redux-thunk`에서
 
 ### Server
 
