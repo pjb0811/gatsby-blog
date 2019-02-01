@@ -652,15 +652,11 @@ class Posts extends Component {
 
 `redux-thunk` 를 사용할때는 `action` 호출의 반환 상태를 객체 대신 함수로 변경한 뒤 비동기 요청 상태에 따라 다른 `action`을 호출해 주었다. 비동기 상태에 따라 `action` 을 호출하다 보면 결국 호출이 여러 단계로 중첩될 수 있으며, 이는 비동기 데이터 처리 로직이 복잡해질수록 중첩된 `action` 호출에 의한 전역 상태의 디버깅 및 테스트가 어려워지게 된다.
 
-`redux-saga`는 동기적인 `action`의 `side effect`를 통해 액션 호출을 비동기적으로 제어할 수 있기 떼문에, `action` 자체가 가지고 있는 본연의 기능을 사용할 수 있으며 상태의 흐름 쉽게 파악할 수 있기 때문에 전역 상태를 관리하는 입장에서 `redux-thunk` 보다 장점을 가지고 있다.
+`redux-saga`는 동기적인 `action`의 `side effect`를 통해 액션 호출을 비동기적으로 제어할 수 있기 때문에, `action` 자체가 가지고 있는 본연의 기능을 사용할 수 있으며 상태의 흐름 또한 쉽게 파악할 수 있기 때문에 전역 상태를 관리하는 입장에서 `redux-thunk` 보다 장점을 가지고 있다.
 
 다만 비동기 액션 처리 시 `es6`의 `generator` 문법을 활용하며, `redux-saga`에서 제공하는 여러 기능의 사용법들은 사용자에 따라 높은 러닝커브를 요구하기도 한다. 나 역시 그 중 한명으로써 익숙하지 않은 `generator` 문법과 기본적인 활용법에 대해 아직 이해하지 못하는 부분이 많다.
 
-그래도 내가 이해하는 범위 내에서 `redux-saga`를 활용한 내용을 정리했다.
-
-### Client
-
-우선 `redux-saga`를 설치하고 `action` 을 생성하는 부분을 수정한다.
+그래도 내가 이해하는 범위 내에서 `redux-saga`를 활용한 내용을 간단히 정리했다. 그럼 우선 `redux-saga`를 설치하고 `action` 을 생성하는 부분을 수정해보자.
 
 ```bash
 yarn add --dev redux-saga
@@ -671,11 +667,13 @@ yarn add --dev redux-saga
 ```javascript
 import { handleActions, createAction } from 'redux-actions'
 
-export const GET_POST = 'GET_POST'
-export const GET_POST_SUCCESS = 'GET_POST_SUCCESS'
-export const GET_POST_ERROR = 'GET_POST_ERROR'
+const GET_POST = 'GET_POST'
+const GET_POST_SUCCESS = 'GET_POST_SUCCESS'
+const GET_POST_ERROR = 'GET_POST_ERROR'
 
 export const getPost = createAction(GET_POST)
+export const getPostSuccess = createAction(GET_POST_SUCCESS)
+export const getPostError = createAction(GET_POST_ERROR)
 
 const initialState = {
   loading: false,
@@ -692,7 +690,6 @@ export default handleActions(
         data: [],
       }
     },
-
     [GET_POST_SUCCESS]: (_, action) => {
       let { data } = action.payload
 
@@ -720,9 +717,110 @@ export default handleActions(
 // ...
 ```
 
-이 전에 `redux-thunk`에서
+이전에는 `GET_POST` 액션 요청에 따라 `GET_POST_LOADING`, `GET_POST_SUCCESS`, `GET_POST_ERROR` 라는 액션을 생성했다. 앞서 말했듯이 새롭게 생성된 액션은 `GET_POST`라는 액션 내부에 중첩된 액션이며 비동기 로직이 복잡해질 경우 해당 액션에 대한 테스트 및 디버깅이 어려워게 된다. 또한 액션 타입을 집적 설정하지 않기 때문에 코드 가독성도 떨어진다.
+
+`redux-saga`의 경우 동기적인 액션을 활용하기 때문에 기본적으로 `redux`를 사용할때처럼 액션을 생성하도록 수정했다. `GET_POST` 액션 요청시 반환 상태에 따라 `GET_POST_SUCCESS`, `GET_POST_ERROR`라는 액션을 호출할 수 있도록 설정했다.
+
+`redux-thunk`를 사용할때와 달리 다른 액션에 종속되지 않는 각각의 독립된 액션으로 사용되기 때문에 비동기 로직이 복잡해지더라도 테스트 및 디버깅에 보다 유리한 이점을 가지고 있다. 실제 비동기 로직이 복잡해질 경우 `redux-saga`를 통해 `task`를 수행하는 과정이 복잡해지겠지만, 기존에 `action` 내부에서 관리했던 역할을 분리할 수 있다는 것만으로드 큰 장점이 된다고 생각한다.
+
+이제 `GET_POST` 액션 호출 시 비동기적으로 `task`를 제어할 수 있도록 코드를 추가해 보자.
+
+- `src/redux/saga/post.js`
+
+```javascript
+import { call, put, take } from 'redux-saga/effects'
+import * as post from '../reducers/post'
+import loadData from '../../lib/loadData'
+
+export function* getPost() {
+  while (true) {
+    try {
+      const { payload } = yield take(post.getPost)
+      const data = yield call(loadData, payload)
+      yield put(post.getPostSuccess({ data }))
+    } catch (e) {
+      yield put(post.getPostError())
+    }
+  }
+}
+```
+
+앞서 설명했듯이 `redux-saga`는 `generator` 및 `redux-saga`에서 제공하는 기능을 활용하여 액션 호출에 대한 `effect`를 통해 비동기적인 액션 호출을 수행할 수 있게 해준다. `getPost`라는 `generator function`을 통해 동기적인 액션 함수 호출에 대한 비동기적인 `task`를 수행할 수 있도록 구현했다.
+
+`try/catch` 문법을 활용하여 `take` 함수를 통해 `getPost` 액션 함수 호출 시 전달받게 되는 인자를 확인한 뒤 `call` 함수를 통해 비동기 요청에 대한 응답 데이터를 반환받도록 했다. 이 후 반환 데이터 여부에 따라 `put` 함수를 통해 `getPostSuccess` 또는 `getPostError` 액션 함수를 호출하도록 구현했다.
+
+이제 구현된 `generator` 함수를 `store`에 연결하기 위한 엔트리 파일을 구현했다.
+
+- `src/redux/saga/index.js`
+
+```javascript
+import { fork } from 'redux-saga/effects'
+import { getPost } from './post'
+
+export default function* rootSaga() {
+  yield fork(getPost)
+}
+```
+
+`fork` 함수를 통해 앞서 구현한 `getPost` 함수를 감지할 수 있도록 한다. 이제 `store` 생성 시 `redux-saga` 미들웨어를 통해 해당 함수를 전달받을 수 있도록 수정해보자.
+
+- `src/redux/store.js`
+
+```javascript
+import { createStore, applyMiddleware } from 'redux'
+import reducers from './reducers'
+import createSagaMiddleware, { END } from 'redux-saga'
+
+export default (initialState = {}) => {
+  const sagaMiddleware = createSagaMiddleware()
+  const store = createStore(
+    reducers,
+    initialState,
+    applyMiddleware(sagaMiddleware)
+  )
+
+  store.runSaga = sagaMiddleware.run
+  store.close = () => store.dispatch(END)
+
+  return store
+}
+```
+
+기존에 사용했던 `redux-thunk` 관련 코드는 지운 뒤, `redux-saga`를 활용하기 위해 미들웨어를 연결하는 부분을 수정했다. 이 후 앞서 구현한 `generator function`을 전달받고 액션 호출과 관련된 `task`를 제어하기 위해 `runSaga`, `close`라는 메서드를 `store`에 추가했다. 그럼 이제 클라이언트 영역에서 `redux-saga`를 사용할 수 있도록 수정해보자.
+
+### Client
+
+- `src/index.js`
+
+```javascript
+// ...
+import store from './redux/store'
+import rootSaga from './redux/sagas'
+
+const initStore = store(window.__INIT_DATA__ || {})
+initStore.runSaga(rootSaga)
+
+ReactDOM.render(
+  <BrowserRouter>
+    <Provider store={initStore}>
+      <App />
+    </Provider>
+  </BrowserRouter>,
+  document.getElementById('root')
+)
+```
+
+이 전에 바로 `store` 객체를 연결할 때와 달리 `runSaga` 메서드를 통해 `rootSaga`로 정의한 `generator function`을 인자로 넘겨준 뒤 `Provider` 컴포넌트에 props로 설정해주었다. 그밖의 구현내용은 이 전에 `redux-thunk`를 통해 기존에 사용했던 코드들을 활용하면 된다. 그럼 이제 클라이언트 영역에서 정상적으로 동작하는지 확인해보자
+
+![redux-saga-client](redux-saga-client.gif)
+
+`redux-thunk`를 사용할때와 같이 `redux-saga`를 활용하여 동기적인 액션뿐만 아니라 비동기적인 액션 요청 또한 정상적으로 처리하는 것을 확인했다.
 
 ### Server
+
+서버 설정은 기존에 구현했던 방식과 다르게 진행되기 때문에 적지 않은 부분에 대한 코드의 변경이 필요하다. 우선 서버 측 렌더링을 담당하는 영역을 수정해보자.
+
+- `src/lib`
 
 ## mobx-react
 
