@@ -464,6 +464,8 @@ export default connect(
 
 이제 서버에서 비동기 데이터를 정상적으로 렌더링할 수 있도록 작업을 진행해보자. 우선 서버 측에서 라우터 주소에 따라 `action`을 호출하기 위한 작업이 필요하다.
 
+- `src/lib/routes.js`
+
 ```javascript
 // ...
 import store from '../redux/store'
@@ -820,7 +822,111 @@ ReactDOM.render(
 
 서버 설정은 기존에 구현했던 방식과 다르게 진행되기 때문에 적지 않은 부분에 대한 코드의 변경이 필요하다. 우선 서버 측 렌더링을 담당하는 영역을 수정해보자.
 
-- `src/lib`
+- `src/lib/renderer.js`
+
+```javascript
+// ...
+import { Provider } from 'react-redux'
+import store from '../redux/store'
+import rootSaga from '../redux/sagas'
+import pretty from 'pretty'
+
+const renderer = ({ req, res, html }) => {
+  const currentRoute = routes.find(route => matchPath(req.url, route)) || {}
+  const initStore = store()
+  const context = {}
+  let modules = []
+
+  initStore
+    .runSaga(rootSaga)
+    .toPromise()
+    .then(() => {
+      const app = renderToString(
+        <Loadable.Capture report={moduleName => modules.push(moduleName)}>
+          <StaticRouter location={req.url} context={context}>
+            <Provider store={initStore}>
+              <App />
+            </Provider>
+          </StaticRouter>
+        </Loadable.Capture>
+      )
+
+      const bundles = getBundles(stats, modules)
+      const renderHTML = html.replace(
+        '<div id="root"></div>',
+        `<div id="root">${app}</div>
+        <script>window.__INIT_DATA__ = ${serialize(
+          initStore.getState()
+        )}</script>
+        ${bundles
+          .filter(bundle => !bundle.file.includes('.map'))
+          .map(bundle => `<script src="${bundle.publicPath}"></script>`)
+          .join('\n')}
+        `
+      )
+
+      if (context.status === 404) {
+        res.status(404)
+      }
+
+      if (context.status === 301) {
+        return res.redirect(301, context.url)
+      }
+
+      res.send(pretty(renderHTML))
+    })
+
+  currentRoute.loadData && currentRoute.loadData(initStore, req.url)
+  initStore.close()
+}
+```
+
+이 전에는 비동기 데이터 요청 시 응답 데이터를 포함하는 초기 상태 객체를 통해 새로운 `store`를 생성한 후 해당 객체를 통한 서버 렌더링 결과를 반환하는 구조였지만 현재는 `redux-saga`에서 제공하는 함수를 통해 비동기 상태 데이터가 응답한 이후 서버 렌더링 데이터를 그려주도록 수정했다.
+
+우선 클라이언트에서 구현했던 내용과 같이 `store`를 생성한 뒤 `rootSaga`로 정의한 `generator function`을 `runSaga`의 인자로 넘겨주었다. 다만 이 전과 달리 모든 `action` 호출은 동기적으로 수행되기 때문에 실제 비동기 데이터를 전달해주는 `action` 호출을 확인하기 위해 `runSaga` 함수 호출 이후 `toPromise().then()` 이라는 체이닝 함수를 활용했다. `then` 함수 호출 시 해당 인자에 대한 콜백 함수를 통해 이 후 렌더링 과정을 구현했다.
+
+이 전과 달리 함수의 반환 값을 넘겨주지 않고 서버 렌더링을 수행하기 때문에 `renderer` 함수 호출 시 `res` 인자를 추가로 전달 받은 뒤 `server/index.js`에서 구현했던 내용을 `then` 함수의 콜백 인자 내부에서 수행할 수 있도록 했다.
+
+이 후 현재 라우터 컴포넌트 요청 시 `loadData` 함수가 확인되는 경우 이 전과 같이 해당 함수를 호출하도록 했다. 다만 이 전과 다른 점은 `loadData` 함수 호출 시 서버에서 생성한 `store` 객체를 인자로 전달받게 했다. 이 후 전달받은 `store`를 통해 각 라우터 컴포넌트에 필요한 `action`를 호출하도록 했다. 중요한 점은 `loadData` 함수 호출 시점은 `runSaga` 함수 호출 이후가 되어야 한다. 그리고 마지막으로 `store` 객체 생성 시 만들어 주었던 `close` 함수를 호출하도록 했다.
+
+사실 `redux-thunk`와 달리 `redux-saga`를 활용한 서버 렌더링 구조의 경우 아직까지 완벽히 이해가 되지 않는다. 이 후 깨달음을 얻게 된다면 내용을 보충할 수 있도록 하자.
+
+이제 `renderer` 함수는 수정했으니 해당 함수가 정상적으로 동작하기 위해 현재 라우터 컴포넌트에서 `action`을 요청하는 부분과 서버 실행 영역을 수정해보자.
+
+- `src/lib/routes.js`
+
+```javascript
+// ...
+import * as postActions from '../redux/reducers/post'
+
+// ...
+
+const Routes = [
+  // ...
+  {
+    path: '/posts/:id',
+    component: Loadable({
+      loader: () => import('../components/Posts'),
+      loading,
+    }),
+    loadData: (store, path) => {
+      store.dispatch(postActions.getPost(path));
+    },
+  },
+  {
+    path: '/posts',
+    component: Loadable({
+      loader: () => import('../components/Posts'),
+      loading,
+    }),
+    loadData: (store, path) => {
+      store.dispatch(postActions.getPost(path));
+    },
+  },
+  // ...
+]
+
+export default Routes
 
 ## mobx-react
 
@@ -831,3 +937,4 @@ ReactDOM.render(
 ## 다음 과제
 
 지금까지 SPA 개발환경에서 비동기 데이터를 처리하는 방법에 대한 내용들을 정리했다. 다음은 `<head/>` 태그 내에서 사용되는 여러가지 요소를 관리해 줄 수 있는 라이브러리인 `react-helmet`를 SPA 환경에서 활용하는 방법에 대한 내용을 정리하고자 한다.
+```
