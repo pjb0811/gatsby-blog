@@ -44,34 +44,53 @@ const styles = theme => ({
 
 class BlogPost extends React.Component {
   render() {
-    const post = this.props.data.markdownRemark
-    const siteDescription = post.excerpt
+    const { pageContext } = this.props
+    const { site, markdownRemark: post } = this.props.data
+    const { title, mainImage } = post.frontmatter
     const { classes } = this.props
     const disqusShortname = 'pjb0811'
     const disqusConfig = {
       identifier: post.id,
-      title: post.frontmatter.title,
+      title,
     }
 
     return (
       <Layout location={this.props.location}>
         <Helmet
           htmlAttributes={{ lang: 'en' }}
-          meta={[{ name: 'description', content: siteDescription }]}
-          title={`${post.frontmatter.title}`}
+          title={`${title}`}
+          meta={[
+            { name: 'description', content: post.html },
+            {
+              name: 'image',
+              content: `${site.siteMetadata.siteUrl}${
+                mainImage.childImageSharp.sizes.src
+              }`,
+            },
+            {
+              name: 'og:url',
+              content: `${site.siteMetadata.siteUrl}${pageContext.slug}`,
+            },
+            { name: 'og:type', content: 'article' },
+            { name: 'og:title', content: title },
+            { name: 'og:description', content: post.html },
+            {
+              name: 'og:image',
+              content: `${site.siteMetadata.siteUrl}${
+                mainImage.childImageSharp.sizes.src
+              }`,
+            },
+          ]}
         />
         <ImageCover
-          img={post.frontmatter.mainImage.childImageSharp.sizes.src}
-          alt={`${post.frontmatter.title}`}
+          img={mainImage.childImageSharp.sizes.src}
+          alt={`${title}`}
         />
         <div className={classes.root}>
           <Grid container spacing={24} className={classes.container}>
             <Grid item xs={12}>
               <Paper className={classes.paper} elevation={1}>
-                <PageTitle
-                  title={post.frontmatter.title}
-                  subTitle={post.frontmatter.date}
-                />
+                <PageTitle title={title} subTitle={post.frontmatter.date} />
                 <div className={classes.buttons}>
                   {post.frontmatter.tags.map((tag, i) => (
                     <Button
@@ -116,6 +135,8 @@ export const pageQuery = graphql`
       siteMetadata {
         title
         author
+        description
+        siteUrl
       }
     }
     markdownRemark(fields: { slug: { eq: $slug } }) {
