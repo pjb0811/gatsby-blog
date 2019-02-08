@@ -57,10 +57,9 @@ class BlogPost extends React.Component {
     return (
       <Layout location={this.props.location}>
         <Helmet
-          htmlAttributes={{ lang: 'en' }}
           title={`${title}`}
           meta={[
-            { name: 'description', content: post.html },
+            { name: 'description', content: post.excerpt },
             {
               name: 'image',
               content: `${site.siteMetadata.siteUrl}${
@@ -73,7 +72,7 @@ class BlogPost extends React.Component {
             },
             { name: 'og:type', content: 'article' },
             { name: 'og:title', content: title },
-            { name: 'og:description', content: post.html },
+            { name: 'og:description', content: post.excerpt },
             {
               name: 'og:image',
               content: `${site.siteMetadata.siteUrl}${

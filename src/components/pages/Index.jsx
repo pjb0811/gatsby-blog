@@ -24,13 +24,12 @@ class Index extends Component {
     return (
       <Layout location={location}>
         <Helmet
-          htmlAttributes={{ lang: 'en' }}
+          title={siteMetadata.title}
           meta={[
             { name: 'description', content: siteMetadata.description },
             { name: 'author', content: siteMetadata.author },
             { name: 'siteUrl', content: siteMetadata.siteUrl },
           ]}
-          title={siteMetadata.title}
         />
         <ImageCover img={mainImage} alt="javascript">
           <Jumbotron />
