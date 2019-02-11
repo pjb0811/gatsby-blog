@@ -27,7 +27,7 @@ tags: ['react']
 
 ![mobx-cycle](./mobx-cycle.png)
 
-`mobx`의 경우 `redux`와 비슷한 흐름으로 데이터를 관리한다고 볼 수 있지만 기본 설정 및 상태를 접근하는 방식에서 차이가 있다. 우선 객체지향적인 설계를 지원하기 때문에 `Classes` 문법을 활용하여 생각보다 쉽게 설계와 구현이 가능했고, 컴포넌트와 상태값을 연결하기 위한 설정을 `Decorator` 문법을 활용하여 `redux`를 사용할때 보다 복잡한 과정을 거치지 않는다. 무엇보다 `observer`, `observable`이라는 개념을 통해 컴포넌트에서 요청하는 `action`에 따라 상태값의 변경하는 과정을 이해하는데 있어 `redux` 보다 좀 쉬웠다.
+`mobx`의 경우 `redux`와 비슷한 흐름으로 데이터를 관리한다고 볼 수 있지만 기본 설정 및 상태를 접근하는 방식에서 차이가 있다. 우선 객체지향적인 설계를 지원하기 때문에 `Class` 문법을 활용하여 생각보다 쉽게 설계와 구현이 가능했고, 컴포넌트와 상태값을 연결하기 위한 설정을 `Decorator` 문법을 활용하여 `redux`를 사용할때 보다 복잡한 과정을 거치지 않는다. 무엇보다 `observer`, `observable`이라는 개념을 통해 컴포넌트에서 요청하는 `action`에 따라 상태값의 변경하는 과정을 이해하는데 있어 `redux` 보다 좀 쉬웠다.
 
 사실 `redux`와 `mobx`를 좀 더 이해한 후 자세히 설명하고 싶지만 현재로서는 개인적인 지식이 아직 많이 부족하기 때문에 이쯤에서 정리하려고 한다. 나중에 시간이 되면 정리하도록 하고 `redux` 와 `mobx`를 어떻게 활용했는지 정리해보자.
 
@@ -885,13 +885,13 @@ const renderer = ({ req, res, html }) => {
 
 우선 클라이언트에서 구현했던 내용과 같이 `store`를 생성한 뒤 `rootSaga`로 정의한 `generator function`을 `runSaga`의 인자로 넘겨주었다. 다만 이 전과 달리 모든 `action` 호출은 동기적으로 수행되기 때문에 실제 비동기 데이터를 전달해주는 `action` 호출을 확인하기 위해 `runSaga` 함수 호출 이후 `toPromise().then()` 이라는 체이닝 함수를 활용했다. `then` 함수 호출 시 해당 인자에 대한 콜백 함수를 통해 이 후 렌더링 과정을 구현했다.
 
-이 전과 달리 함수의 반환 값을 넘겨주지 않고 서버 렌더링을 수행하기 때문에 `renderer` 함수 호출 시 `res` 인자를 추가로 전달 받은 뒤 `server/index.js`에서 구현했던 내용을 `then` 함수의 콜백 인자 내부에서 수행할 수 있도록 했다.
+이 전과 달리 함수의 반환 값을 넘겨주지 않고 서버 렌더링을 수행하기 때문에 `renderer` 함수 호출 시 `res` 인자를 추가로 전달 받은 뒤 `server/index.js`에서 구현했던 내용을 `then` 함수의 콜백 인자 내부에서 수행할 수 있도록 했다. 이 전에는 `async/await` 문법을 활용하여 비동기 요청에 대한 응답 데이터를 반환했지만 현재 구조에서는 필요하지 않기 때문에 일반 함수의 구조로 수정했다.
 
 이 후 현재 라우터 컴포넌트 요청 시 `loadData` 함수가 확인되는 경우 이 전과 같이 해당 함수를 호출하도록 했다. 다만 이 전과 다른 점은 `loadData` 함수 호출 시 서버에서 생성한 `store` 객체를 인자로 전달받게 했다. 이 후 전달받은 `store`를 통해 각 라우터 컴포넌트에 필요한 `action`를 호출하도록 했다. 중요한 점은 `loadData` 함수 호출 시점은 `runSaga` 함수 호출 이후가 되어야 한다. 그리고 마지막으로 `store` 객체 생성 시 만들어 주었던 `close` 함수를 호출하도록 했다.
 
 사실 `redux-thunk`와 달리 `redux-saga`를 활용한 서버 렌더링 구조의 경우 아직까지 완벽히 이해가 되지 않는다. 이 후 깨달음을 얻게 된다면 내용을 보충할 수 있도록 하자.
 
-이제 `renderer` 함수는 수정했으니 해당 함수가 정상적으로 동작하기 위해 현재 라우터 컴포넌트에서 `action`을 요청하는 부분과 서버 실행 영역을 수정해보자.
+이제 `renderer` 함수는 수정했으니 해당 함수가 정상적으로 동작하도록 라우터 컴포넌트에서 `action`을 요청하는 부분과 서버 실행 영역을 수정해보자.
 
 - `src/lib/routes.js`
 
@@ -910,7 +910,7 @@ const Routes = [
       loading,
     }),
     loadData: (store, path) => {
-      store.dispatch(postActions.getPost(path));
+      store.dispatch(postActions.getPost(path))
     },
   },
   {
@@ -920,15 +920,131 @@ const Routes = [
       loading,
     }),
     loadData: (store, path) => {
-      store.dispatch(postActions.getPost(path));
+      store.dispatch(postActions.getPost(path))
     },
   },
   // ...
 ]
 
 export default Routes
+```
+
+이 전과 달리 라우팅 영역에서 `store`를 직접 생성하지 않고 서버측에서 전달받은ㅇ `store`를 통해 `action`을 `dispatch` 하도록 수정했다. 렌더링 시와 마찬가지로 `async/await` 문법이 필요하지 않기 때문에 기본 함수 문법으로 수정했다.
+
+- `server/index.js`
+
+```javascript
+// ...
+
+app.all('*', (req, res) => {
+  renderer({ req, res, html: indexHTML })
+})
+
+// ...
+```
+
+라우팅 처리 시에도 이 전과 달리 함수 호출 시 반환받은 데이터를 처리하지 않고 `res` 인자를 넘겨준 뒤 `renderer` 함수에서 처리하도록 수정해주었다. 서버 측 설정도 완료되었으니 서버 실행 후 렌더링 결과를 확인해보면 서버 측에서 정상적으로 동작되는 것을 확인할 수 있다.
 
 ## mobx-react
+
+![mobx-react](./mobx-react.jpg)
+
+앞서 설명한대로 `mobx` 또한 JavaScript 환경에서 사용 가능하지만 react 개발 환경에서 좀 더 쉽게 사용할 수 있도록 `mobx-react`라는 라이브러리를 같이 사용했다. 그리고 `mobx` 의 경우 `redux`와 달리 여러개의 `store`를 생성하여 전역 상태를 관리할 수 있다. `redux` 처럼 `reducer`, `action`을 따로 분리하지 않고 `store` 내에서 설정할 수 있다. 그래서 `store`의 개념 또한 `redux`와 조금 다르다고 생각한다.
+
+또한 `mobx`의 경우 기본적인 문법으로 구현 가능하지만 `Class` 문법을 통해 좀 더 쉽게 구현할 수 있으며, 나 역시 `Class` 및 `Decotator` 문법을 활용했다. 다만 `Decorator` 문법을 활용할 경우 `babel` 플러그인 설정이 필요하기 때문에 관련 라이브러리도 추가했다.
+
+그럼 우선 라이브러리를 설치하자.
+
+```bash
+yarn add --dev mobx mobx-react @babel/plugin-proposal-decorators
+```
+
+설치를 완료한 후 `mobx` 를 이용하여 `store`들을 생성해보자.
+
+- `src/mobx/Counter.js`
+
+```javascript
+import { observable, action } from 'mobx'
+
+class Counter {
+  @observable
+  count = 1
+
+  @action
+  increment = () => {
+    this.count += 1
+  }
+
+  @action
+  decrement = () => {
+    this.count -= 1
+  }
+}
+
+export default Counter
+```
+
+우선 `Counter` 컴포넌트에서 사용할 `Class`를 생성했다. 해당 `Class`를 하나의 `store`로 볼 수 있으며 이 후 `mobx`에서 제공하는 `decorator`을 통해 `Class`의 정의된 프로퍼티를 관리하도록 설정했다. 해당 `decorator`를 통해 `action`으로 명시된 메서드 호출 시 `observable`로 명시된 프로퍼티의 변경 상태를 감지할 수 있도록 구현했다.
+
+- `src/mobx/Posts.js`
+
+```javascript
+import { observable, action, computed, toJS } from 'mobx'
+import loadData from '../lib/loadData'
+
+class Post {
+  @observable
+  state = {
+    loading: false,
+    error: false,
+    data: [],
+  }
+
+  @action
+  getPost = async path => {
+    this.state = {
+      ...this.state,
+      loading: true,
+      data: [],
+    }
+
+    try {
+      const data = await loadData(path)
+      this.state.loading = false
+      this.state.data = Array.isArray(data) ? data : [data]
+    } catch (e) {
+      this.state.error = true
+    }
+  }
+
+  @computed
+  get data() {
+    return toJS(this.state.data)
+  }
+}
+
+export default Post
+```
+
+`Posts` 컴포넌트에서 사용할 `Post Class` 를 구현했다. 앞서 구현한 `Counter Class` 와 같이 `action`, `observable`를 활용했다. 액션 함수인 `getPost`의 경우 비동기 요청을 위해 `async/await` 문법을 활용했다. 또한 감시대상으로 설정된 `state` 내 프로퍼티를 확인히기 위해 `computed`, `toJS` 함수를 사용했다. `mobx`의 경우 `observable`로 명시된 객체의 경우 자체적으로 **불변성(immutable)**을 관리해주기 때문에 일반 객체로 치환이 필요하다. 사실 `redux`를 사용할 때도 객체의 불변성을 관리해주어야 하지만 따로 구현하지 않았다. 해당 내용에 관해서는 나중에 따로 포스팅할 수 있도록 하자.
+
+- `src/mobx/Store.js`
+
+```javascript
+import Counter from './Counter'
+import Post from './Post'
+
+class Store {
+  constructor(props) {
+    this.counter = new Counter()
+    this.post = new Post()
+  }
+}
+
+export function initStore() {
+  return new Store()
+}
+```
 
 ### Client
 
@@ -937,4 +1053,3 @@ export default Routes
 ## 다음 과제
 
 지금까지 SPA 개발환경에서 비동기 데이터를 처리하는 방법에 대한 내용들을 정리했다. 다음은 `<head/>` 태그 내에서 사용되는 여러가지 요소를 관리해 줄 수 있는 라이브러리인 `react-helmet`를 SPA 환경에서 활용하는 방법에 대한 내용을 정리하고자 한다.
-```
