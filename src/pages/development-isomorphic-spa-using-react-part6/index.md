@@ -195,6 +195,10 @@ class Counter extends Component {
 export default Counter
 ```
 
+`redux`를 사용할때와 달리 컴포넌트 영역에서도 `decorator` 문법을 활용하여 상태 데이터를 컴포넌트에 주입하도록 수정했다. 이 전과 달리 컴포넌트를 `export`할때 `HoC` 패턴을 통해 상태 정보와 `action` 정보를 따로 설정하지 않아도 된다. 대신 `mobx-react` 에서 제공하는 `inject` 함수를 통해 `root store`로부터 전달받은 프로퍼티 중 `counter store`만을 사용할 수 있도록 명시해주었다.
+
+이 후 ``
+
 - `src/components/Posts.jsx`
 
 ```javascript
