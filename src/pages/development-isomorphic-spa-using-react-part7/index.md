@@ -76,6 +76,11 @@ class App extends Component {
         <Helmet>
           <title>My App</title>
           <meta name="description" content="my app" />
+          <style>
+            {`body {
+              background-color: green 
+            }`}
+          </style>
         </Helmet>
         <Switch>
           {routes.map((route, i) => (
@@ -88,8 +93,117 @@ class App extends Component {
 }
 ```
 
-사용법은 어렵지 않다. 렌더링 시 `react-helmet`에서 제공하는 `Helmet` 컴포넌트의 자식 요소에 사용하고자 하는 태그를 설정해주면 된다.
+사용법은 어렵지 않다. `react-helmet`에서 제공하는 `Helmet` 컴포넌트의 자식 요소에 사용하고자 하는 태그를 설정해준 뒤 렌더링해주면 된다.
+
+해당 컴포넌트의 경우 모든 라우팅 컴포넌트에 대한 최상위의 부모 컨포넌트이기 때문에 각 라우팅 컴포넌트는 `App` 에서 설정한 `head` 정보를 사용하게 된다.
+
+`Helmet` 컴포넌트의 설정된 `head` 정보는 `cascade` 방식으로 적용되기 때문에 각 라우팅 컴포넌트 별로 필요한 `head` 정보를 설정해주면 된다.
+
+- `src/components/About.jsx`
+
+```javascript
+// ...
+import { Helmet } from 'react-helmet'
+
+const About = () => {
+  return (
+    <div>
+      <Helmet>
+        <title>About</title>
+        <meta name="description" content="about" />
+        <style>
+          {`body {
+              font-size: 20px;
+            }`}
+        </style>
+      </Helmet>
+      <h1>About</h1>
+      <Counter />
+    </div>
+  )
+}
+// ...
+```
+
+`About` 컴포넌트의 경우 `head` 정보를 새롭게 설정해주었다. `App` 에서 설정한 `title`, `meta` 요소 변경 및 새로운 `style` 요소를 추가해 주었다. 그럼 이제 실행화면을 확인해보자.
+
+![head-after](./head-after.gif)
+
+`About` 컴포넌트를 제외한 나머지 라우팅 컴포넌트에서는 `App` 에서 설정한 `head` 정보를 사용하는 것을 확인했다.
+
+또한 부모 컴포넌트로부터 상속받은 `head` 정보에서 중복되지 않아야 할 요소는 기존 요소의 컨텐츠가 변경되며 중복 가능한 요소는 새롭게 추가되는 것을 확인했다.
+
+그럼 이제 서버 측 영역에서 `head` 정보를 렌더링하도록 해보자.
 
 ### Server
 
+서버 측 렌더링 설정도 크게 어렵지 않다. 기존에 서버 렌더링 정보를 반환하는 `renderer` 함수 호출 시 `head` 요소에 대한 정적 데이터 정보를 추가해주면 된다.
+
+- `src/lib/renderer.js`
+
+```javascript
+// ...
+import { Helmet } from 'react-helmet'
+
+const renderer = async ({ req, html }) => {
+  // ...
+
+  const app = renderToString(
+    <Loadable.Capture report={moduleName => modules.push(moduleName)}>
+      <StaticRouter location={req.url} context={context}>
+        <Provider {...store}>
+          <App />
+        </Provider>
+      </StaticRouter>
+    </Loadable.Capture>
+  )
+
+  const helmet = Helmet.renderStatic()
+  const bundles = getBundles(stats, modules)
+  const renderHTML = html
+    .replace(
+      '</head>',
+      `${helmet.title.toString()}
+      ${helmet.meta.toString()}
+      ${helmet.style.toString()}
+      </head>`
+    )
+    .replace(
+      '<div id="root"></div>',
+      `<div id="root">${app}</div>
+    <script>window.__INIT_DATA__ = ${serialize(toJS(store))}</script>
+    ${bundles
+      .filter(bundle => !bundle.file.includes('.map'))
+      .map(bundle => `<script src="${bundle.publicPath}"></script>`)
+      .join('\n')}
+    `
+    )
+
+  return {
+    html: renderHTML,
+    context,
+  }
+}
+
+module.exports = renderer
+```
+
+`renderToString` 함수 호출 이 후 `react-helmet` 에서 제공하는 `renderStatic` 함수를 호출하여 `App` 컴포넌트에 설정된 `head` 정보의 데이터를 가져왔다. 이 후 렌더링된 문자열 반환 시 `head` 요소 내부에 가져온 요소를 추가한 문자열을 반환하도록 수정했다.
+
+현재는 `title`, `meta`, `script` 요소에 대한 문자열을 설정했지만 이 후 필요한 요소가 있을 경우 그에 맞는 데이터를 추가해주면 된다.
+
+그럼 이제 서버 측 수정도 완료되었으니 결과를 확인해보자.
+
+![head-server-home](./head-server-home.png)
+
+![head-server-about](./head-server-about.png)
+
+`App` 컴포넌트에서 설정한 기본 `head` 요소 및 `About` 컴포넌트에서 설정한 `head` 요소에 대한 서버 렌더링이 정상적으로 동작하는 것을 확인할 수 있다.
+
 ## 글을 마치며
+
+지금까지 React를 활용한 `Isomorphic SPA` 개발에 필요한 내용들을 정리해봤다.
+
+사실 내 나름대로 구현한 내용을 정리한 내용이라 부족한 부분도 있으며, 인터넷 여기저기서 검색한 내용들을 정리하기도 해서 조금 아쉬운 부분도 있다.
+
+그래도 글을 정리하면서 실제 개발만 했던 것보다 머리속에 좀 더 정리가 되었던 것 같다. 앞으로도 이 전에 해왔던 개발경험 뿐만 아니라 이 후 개발하면서 배웠던 내용들을 꾸준히 정리할 수 있었으면 한다.
