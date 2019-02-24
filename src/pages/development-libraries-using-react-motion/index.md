@@ -5,7 +5,7 @@ mainImage: './react-motion.jpg'
 tags: ['react', 'css']
 ---
 
-> 이 글은 react 환경에서 애니메이션 효과를 쉽게 사용할 수 있도록 도와주는 `react-motion`를 사용하면서 배웠던 내용들을 정리했다. 이번 글 역시 스스로의 학습 내용을 정리하는 글이기 때문에 편한 말투로 작성했다.
+> 이 글은 react 환경에서 애니메이션 효과를 쉽게 사용할 수 있도록 도와주는 `react-motion`를 사용하면서 배웠던 내용들을 정리했다. 이번 글 역시 스스로의 학습 내용을 정리하는 글이기 때문에 편한 말투로 작성했다.<!-- end -->
 
 기본적으로 웹에서 애니메이션을 다루는 방법은 굉장히 다양하다. `CSS`를 활용한 기본적인 애니메이션부터 `canvas`를 활용한 애니메이션, `DOM` 기반의 `Web Animations` 등 다양한 방법을 통해 애니메이션을 사용할 수 있다.
 
@@ -206,6 +206,189 @@ class Carousel extends React.Component<Props, State> {
 
 ## Cube
 
-## Windows
+두번째로 만들어 본 컴포넌트는 `Cube` 형태의 애니메이션 컴포넌트이다. 프로젝트를 진행하면서 특정 상품에 대한 여러 방향의 이미지를 화면에 표현하고 싶었다. 앞서 만든 `Carousel` 컴포넌트를 통해서도 상품 이미지에 대한 입체적인 표현이 가능했지만 `Cube` 형태의 애니메이션을 통해 좀 더 다양한 UX를 제공하고 싶었다.
+
+```javascript
+import React from 'react'
+import Cube from './Cube'
+
+class App extends React.Component {
+  render() {
+    const defaultStyle = {
+      width: 300,
+      height: 300,
+      margin: '50px auto',
+    }
+
+    return (
+      <div>
+        <h1>Cube</h1>
+        <div
+          style={{
+            ...defaultStyle,
+          }}
+        >
+          <Cube size={300} index="front">
+            <div>front</div>
+            <div>right</div>
+            <div>back</div>
+            <div>left</div>
+            <div>top</div>
+            <div>bottom</div>
+          </Cube>
+        </div>
+      </div>
+    )
+  }
+}
+```
+
+`Cube` 컴포넌트의 경우 앞서 설정한 `Carousel` 컴포넌트보다는 좀 더 단순하다. 현재까지 구현된 내용의 경우 기본적으로 정육면체의 큐브형태의 UI를 제공하기 때문에 일정한 높이와 너비를 설정하기 위한 `size` 값을 props로 전달받도록 했다. 이 후에 높이와 너비를 다르게 설정해 줄 수 있도록 수정할 계획이다.
+
+그리고 화면에 처음 표시될 영역에 대한 요소를 설정하기 위해 `index`라는 props를 활용했다. `front`, `right`, `back`, `left`, `top`, `bottom` 이라는 값을 통해 처음 표시될 영역에 대한 설정이 가능하도록 했다.
+
+컴포넌트의 자식 요소 역시 순서대로 `front`, `right`, `back`, `left`, `top`, `bottom` 위치에 설정되면 최대 6개의 요소만이 추가될 수 있다. 자식 요소가 없는 경우 기본적으로 설정한 UI를 표시하도록 구현했다.
+
+```javascript
+import * as React from 'react'
+import { Motion, spring } from 'react-motion'
+// ...
+
+class Cube extends React.Component<Props, State> {
+  // ...
+
+  render() {
+    const { cube, faces, children } = this.state
+    return (
+      <div className={styles.cubeWrapper}>
+        <Motion
+          style={{
+            rotateX: spring(cube.rotateX),
+            rotateY: spring(cube.rotateY),
+            rotateZ: spring(cube.rotateZ),
+          }}
+        >
+          {({ rotateX, rotateY, rotateZ }) => {
+            return (
+              <div
+                className={styles.cube}
+                style={{
+                  transform: `translate3d(${cube.translate.x}px, ${
+                    cube.translate.y
+                  }px, ${
+                    cube.translate.z
+                  }px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`,
+                }}
+              >
+                {Object.keys(faces).map((face, key) => {
+                  const { translate, rotate } = faces[face]
+
+                  return (
+                    <div
+                      className={`${styles.cubeFace} ${styles[face]}`}
+                      key={key}
+                      style={{
+                        transform: `translate3d(${translate.x}px, ${
+                          translate.y
+                        }px, ${translate.z}px) rotate3d(${rotate.x}, ${
+                          rotate.y
+                        }, ${rotate.z}, ${rotate.deg}deg)`,
+                        width: cube.width,
+                        height: cube.height,
+                      }}
+                      onMouseDown={e => {
+                        this.handleMouseDown(e)
+                      }}
+                      onMouseMove={e => {
+                        this.handleMouseMove(e)
+                      }}
+                      onMouseLeave={() => {
+                        this.handleMouseUp()
+                      }}
+                      onMouseUp={() => {
+                        this.handleMouseUp()
+                      }}
+                    >
+                      {children[key]}
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          }}
+        </Motion>
+      </div>
+    )
+  }
+}
+```
+
+`Cube` 컴포넌트에서 `react-motion`을 활용한 부분이다. 앞서 설명한 `Carousel` 컴포넌트와는 달리 하나의 `Motion` 컴포넌트만을 활용한다. `CSS3` 에서 제공하는 `translate3d`, `rotate3d` 속성을 활용하였고, 큐브 형태의 요소를 감싸는 부모 요소에 설정된 이벤트를 통해 마우스의 움직임에 따라 애니메이션 효과를 나타낼 수 있도록 구현했다.
+
+<figure>
+  <iframe src="https://codesandbox.io/embed/x3l8xzv0w4?fontsize=14" style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe>
+</figure>
+
+지금까지 구현된 컴포넌트에 대한 샘플 코드이다. 앞서 구현한 `Carousel` 컴포넌트와 마찬가지로 필요한 기능은 계속 추가해줄 수 있도록 하자.
+
+## Window
+
+앞서 설명한 기능들 이외에도 여러가지 기능들을 제공하는 컴포넌트를 구현했지만 그 중에서도 가장 노력을 기울였던 `Window` 컴포넌트에 대한 내용을 정리하려고 한다.
+
+이 또한 프로젝트를 진행하면서 브라우저 영역 내에서 새로운 레이어 팝업을 사용하기 위해 구현한 컴포넌트이다. 다만 기존에 사용했던 레이어 팝업과는 달리 `Windows 탐색기`와 같이 `최소/최대화` 및 `창 크기 조절`, 드래그 이벤트를 통한 `창 위치 변경` 과 같이 기능들을 제공하는 컴포넌트가 필요했다. 다만 위와 같은 기능들을 제공하는 컴포넌트의 경우 애니메이션을 활용하지 않더라도 충분히 구현할 수 있지만, 실제 데스크탑 환경에서 사용하는 윈도우 창과 같이 동적인 움직임을 표현해 줄 수 있도록 하고 싶었다.
+
+```javascript
+import React from 'react'
+import Window from './Window'
+
+class App extends React.Component {
+  state = {
+    window: {
+      isOpen: false,
+    },
+  }
+
+  render() {
+    return (
+      <div>
+        <Window
+          width={300}
+          height={300}
+          minWidth={300}
+          minHeight={300}
+          position="top"
+          direction="top"
+          titlebar={{
+            use: true,
+            height: 50,
+            component: props => <Titie {...props} />,
+          }}
+          resize={true}
+          open={this.state.window.isOpen}
+          onClose={() => {
+            this.setState({
+              window: {
+                isOpen: false,
+              },
+            })
+          }}
+        >
+          window
+        </Window>
+      </div>
+    )
+  }
+}
+```
+
+`Window` 컴포넌트를 사용하는 기본적인 코드이다. `width`, `height` props를 통해 컴포넌트 사이즈 및 `minWidth`, `minHeight` 값을 통해 최소 사이즈를 설정할 수 있다. `position`의 경우 화면 중심을 기준으로 컴포넌트 호출 시 최종적으로 나타나는 위치를 설정할 수 있으며 `direction`의 경우 컴포넌트 노출 시 해당 컴포넌트가 움직이는 뱡향을 설정해 줄 수 있다. `position`, `direction`의 경우 `top`, `bottom`, `left`, `right`라는 값을 통해 위치 및 방향을 설정할 수 있으며 `position`의 경우 `center` 값이 추가되어 화면 중심에 위치할 수 있다.
+
+<figure>
+  <iframe src="https://codesandbox.io/embed/jv3nyzl8nw?fontsize=14" style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe>
+</figure>
 
 ## 글을 마치며
+
+`react-motion`을 활용하여 개발을 하다보니 우선 이 전에 많이 사용해보지 않았던 `CSS3 Animation`에 대해 많이 공부할 수 있었다. 그래서인지 애니메이션 효과를 나타내기 위한 과정이 생각보다 쉽지 않다는 것 또한 느꼈다. 당연한 얘기일 수도 있지만 기존 개발 과정보다 좀 더 수학적인 접근이 필요해서 더욱 힘들었던 것 같다.
+
+그리고 앞서 정리한 써드파티 라이브러리의 경우 개인적으로 개발 공부를 하기 위해 일일 커밋 프로젝트였기 때문에 누군가가 많이 사용해주었으면 하는 바람보다는 스스로의 개발경험을 쌓고자 했고, 그래서인지 구현된 컴포넌트의 내용과 포스팅한 내용또한 남을 배려하지 않고 불친절한 글이 된 것 같다.
