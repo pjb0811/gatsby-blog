@@ -383,12 +383,141 @@ class App extends React.Component {
 
 `Window` 컴포넌트를 사용하는 기본적인 코드이다. `width`, `height` props를 통해 컴포넌트 사이즈 및 `minWidth`, `minHeight` 값을 통해 최소 사이즈를 설정할 수 있다. `position`의 경우 화면 중심을 기준으로 컴포넌트 호출 시 최종적으로 나타나는 위치를 설정할 수 있으며 `direction`의 경우 컴포넌트 노출 시 해당 컴포넌트가 움직이는 뱡향을 설정해 줄 수 있다. `position`, `direction`의 경우 `top`, `bottom`, `left`, `right`라는 값을 통해 위치 및 방향을 설정할 수 있으며 `position`의 경우 `center` 값이 추가되어 화면 중심에 위치할 수 있다.
 
+`titlebar` 옵션의 경우 상단 타이틀 영역에 대한 옵션으로, 타이틀바가 필요한 컴포넌트를 추가로 설정할 수 있도록 구현했다. `titlebar` 옵션 설정 시 객체타입으로 설정 가능하며, `component`라는 콜백 함수를 통해 해당 영역에 대한 UI를 추가적으로 설정해줄 수 있도록 했으며
+콜백 함수 사용 시 전달받는 인자를 통해 상단 타이틀 영역에 필요한 여러가지 이벤트를 전달받을 수 있도록 했다.
+
+`resize` 옵션의 경우 해당 컴포넌트의 크기를 변경 여부를 설정할 수 있으며, `open` props을 통해 해당 컴포넌트의 표시 여부를 설정할 수 있도록 구현했다. `onClose` 함수의 경우 해당 컴포넌트를 닫을 시 실행하는 콜백 함수 타입의 props로 구현했다.
+
+```javascript
+import { Motion, TransitionMotion, spring } from 'react-motion'
+import * as React from 'react'
+import Resizable from './Resizable'
+import TitleBar from './TitleBar'
+import Contents from './Contents'
+
+// ...
+
+class Window extends React.Component<Props, State> {
+  // ...
+
+  render() {
+    // ...
+
+    return (
+      <Motion
+        style={{
+          left: spring(wrapper.isFull ? 0 : resizable.position.left),
+          top: spring(wrapper.isFull ? 0 : resizable.position.top),
+          width: spring(
+            wrapper.isFull
+              ? wrapper.width
+              : wrapper.width + resizable.position.right
+          ),
+          height: spring(
+            wrapper.isFull
+              ? wrapper.height
+              : wrapper.height + resizable.position.bottom
+          ),
+          wrapperTop: spring(wrapper.top),
+          wrapperLeft: spring(wrapper.left),
+        }}
+      >
+        {({ top, left, width, height, wrapperTop, wrapperLeft }) => {
+          return (
+            <div
+              className={`${styles.windowWrapper}`}
+              style={{
+                top: wrapperTop,
+                left: wrapperLeft,
+                visibility: wrapper.show ? 'visible' : 'hidden',
+                zIndex,
+              }}
+            >
+              <Resizable
+                width={resizeWidth}
+                height={resizeHeight}
+                cells={resizeCells}
+                resize={resize}
+                resizable={resizable}
+                resizableMouseDown={this.resizableMouseDown}
+                resizableMouseMove={this.resizableMouseMove}
+                resizableMouseUp={this.resizableMouseUp}
+                resizableDoubleClick={this.resizableDoubleClick}
+              />
+              <TransitionMotion
+                willEnter={this.willEnter}
+                willLeave={this.willLeave}
+                didLeave={this.didLeave}
+                styles={this.state.cells.map(
+                  (cell: { top: number, left: number }, i) => {
+                    const { top, left } = cell
+                    return {
+                      key: `${i}`,
+                      style: {
+                        top: spring(top),
+                        left: spring(left),
+                      },
+                    }
+                  }
+                )}
+              >
+                {cells => (
+                  <React.Fragment>
+                    {cells.map(cell => {
+                      return (
+                        <div
+                          key={cell.key}
+                          className={styles.window}
+                          style={{
+                            top: cell.style.top + top,
+                            left: cell.style.left + left,
+                            width: width - left,
+                            height: height - top,
+                          }}
+                        >
+                          <TitleBar
+                            titlebar={titlebar}
+                            width={width - left}
+                            isFulling={this.isFulling}
+                            toggleWindowSize={this.toggleWindowSize}
+                            handleMouseDown={this.handleMouseDown}
+                            removeWindow={this.removeWindow}
+                          />
+                          <Contents
+                            titlebar={titlebar}
+                            width={width - left}
+                            height={height - top}
+                            children={children}
+                          />
+                        </div>
+                      )
+                    })}
+                  </React.Fragment>
+                )}
+              </TransitionMotion>
+            </div>
+          )
+        }}
+      </Motion>
+    )
+  }
+}
+```
+
+실제 구현한 코드 중 일부로서 렌더링 시 `react-motion`을 활용한 부분에 대한 코드이다. 앞서 정리한 컴포넌트의 경우 `Motion` 컴포넌트만을 활용했지만 현재 컴포넌트에서는 `Motion` 컴포넌트와 함께 `TransitionMotion` 컴포넌트를 활용했다.
+
+`Motion` 컴포넌트의 경우 표시된 창 영역에 대하여 마우스 이벤트를 통한 `위치 이동`, `최소/최대화` 및 `크기 변경`과 같은 기능에 대한 애니메이션 효과를 표현할 수 있도록 하였으며, `TransitionMotion` 컴포넌트의 경우 `창 호출/닫기` 이벤트 요청 시 자신을 포함한 하위 컴포넌트에 대한 `mount/unmount` 처리를 `willEnter`, `willLeave`, `didLeave`와 같은 props를 통해 처리해주도록 했다.
+
 <figure>
   <iframe src="https://codesandbox.io/embed/jv3nyzl8nw?fontsize=14" style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe>
 </figure>
+
+앞서 설명한 `Window` 컴포넌트를 사용한 간단한 예제 코드이다. 앞으로도 추가할 기능들이 많다고 생각하기 때문에 코드를 좀 더 개선할 수 있도록 해야겠다.
 
 ## 글을 마치며
 
 `react-motion`을 활용하여 개발을 하다보니 우선 이 전에 많이 사용해보지 않았던 `CSS3 Animation`에 대해 많이 공부할 수 있었다. 그래서인지 애니메이션 효과를 나타내기 위한 과정이 생각보다 쉽지 않다는 것 또한 느꼈다. 당연한 얘기일 수도 있지만 기존 개발 과정보다 좀 더 수학적인 접근이 필요해서 더욱 힘들었던 것 같다.
 
-그리고 앞서 정리한 써드파티 라이브러리의 경우 개인적으로 개발 공부를 하기 위해 일일 커밋 프로젝트였기 때문에 누군가가 많이 사용해주었으면 하는 바람보다는 스스로의 개발경험을 쌓고자 했고, 그래서인지 구현된 컴포넌트의 내용과 포스팅한 내용또한 남을 배려하지 않고 불친절한 글이 된 것 같다.
+그리고 앞서 정리한 써드파티 라이브러리의 경우 개인적으로 개발 공부를 하기 위해 일일 커밋 프로젝트였기 때문에 누군가가 많이 사용해주었으면 하는 바람보다는 스스로의 개발경험을 쌓고자 하는 목적으로 만들게 되었고, 무엇보다 짧은 시간동안 지금까지 개발해왔던 내용들을 급하게 글로 정리하려다 보니 구현된 컴포넌트의 내용과 포스팅한 내용 또한 남을 배려하지 않고 불친절한 글이 된 것 같다.
+
+다만 앞서 정리한 프로젝트의 개발 또한 아직 마무리되지 않았기 때문에 시간이 날때마다 해당 포스팅을 꾸준히 업데이트할 수 있도록 해야할 것이다.
