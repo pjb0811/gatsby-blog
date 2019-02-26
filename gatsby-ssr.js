@@ -1,14 +1,15 @@
+/* 
 const React = require('react')
 const { renderToString } = require('react-dom/server')
 const JssProvider = require('react-jss/lib/JssProvider').default
 const getPageContext = require('./src/utils/getPageContext').default
 // const { Helmet } = require('react-helmet')
 
-exports.replaceRenderer = ({
+function replaceRenderer({
   bodyComponent,
   replaceBodyHTMLString,
   setHeadComponents,
-}) => {
+}) {
   // Get the context of the page to collected side effects.
   const muiPageContext = getPageContext()
   // const helmet = Helmet.renderStatic()
@@ -17,6 +18,8 @@ exports.replaceRenderer = ({
       {bodyComponent}
     </JssProvider>
   )
+
+  replaceBodyHTMLString(bodyHTML)
 
   setHeadComponents([
     // helmet.title.toComponent(),
@@ -34,5 +37,7 @@ exports.replaceRenderer = ({
       }}
     />,
   ])
-  replaceBodyHTMLString(bodyHTML)
 }
+
+exports.replaceRenderer = replaceRenderer
+ */

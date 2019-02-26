@@ -12,10 +12,10 @@ function withRoot(Component) {
     }
 
     componentDidMount() {
-      /* const jssStyles = document.querySelector('#jss-server-side')
+      const jssStyles = document.querySelector('#jss-server-side')
       if (jssStyles && jssStyles.parentNode) {
         jssStyles.parentNode.removeChild(jssStyles)
-      } */
+      }
     }
 
     render() {

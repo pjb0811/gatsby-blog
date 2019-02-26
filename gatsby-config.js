@@ -19,6 +19,12 @@ module.exports = {
   pathPrefix: SITE_CONFIG.pathPrefix,
   plugins: [
     {
+      resolve: 'gatsby-plugin-material-ui',
+      options: {
+        dangerouslyUseGlobalCSS: true,
+      },
+    },
+    {
       resolve: 'gatsby-source-filesystem',
       options: {
         path: `${__dirname}/src/pages/`,
