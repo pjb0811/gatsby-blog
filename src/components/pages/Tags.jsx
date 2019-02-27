@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { graphql } from 'gatsby'
 import { withStyles } from '@material-ui/core/styles'
-import Layout from '../templates/Layout'
+import withLayout from '../templates/withLayout'
 import Paper from '@material-ui/core/Paper'
 import ImageCover from '../molecules/ImageCover'
 import tagImage from '../../assets/tags.jpg'
@@ -50,7 +50,7 @@ class Tags extends Component {
     }
 
     return (
-      <Layout location={this.props.location}>
+      <Fragment>
         <Helmet title={`tags - ${tag}`} />
         <ImageCover img={images[tag] || tagImage} alt={tag} />
         <div className={classes.root}>
@@ -67,12 +67,12 @@ class Tags extends Component {
             </Grid>
           </Grid>
         </div>
-      </Layout>
+      </Fragment>
     )
   }
 }
 
-export default withStyles(styles, { name: 'tags' })(Tags)
+export default withLayout(withStyles(styles, { name: 'tags' })(Tags))
 
 export const pageQuery = graphql`
   query($tag: String) {

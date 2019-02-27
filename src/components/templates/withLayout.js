@@ -1,11 +1,16 @@
 import React from 'react'
+import AppBar from '../organisms/AppBar'
+import Footer from '../organisms/Footer'
+import Helmet from 'react-helmet'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import JssProvider from 'react-jss/lib/JssProvider'
 import getPageContext from '../../utils/getPageContext'
+import 'typeface-roboto'
+// import { loadCSS } from 'fg-loadcss/src/loadCSS'
 
-function withRoot(Component) {
-  class WithRoot extends React.Component {
+const Layout = Component => {
+  return class extends React.Component {
     constructor(props) {
       super(props)
       this.muiPageContext = getPageContext()
@@ -18,6 +23,15 @@ function withRoot(Component) {
       }
     }
 
+    /*
+    componentDidMount() {
+      loadCSS(
+        'https://use.fontawesome.com/releases/v5.1.0/css/all.css',
+        document.querySelector('#___gatsby')
+      )
+    }
+    */
+
     render() {
       return (
         <JssProvider generateClassName={this.muiPageContext.generateClassName}>
@@ -26,14 +40,21 @@ function withRoot(Component) {
             sheetsManager={this.muiPageContext.sheetsManager}
           >
             <CssBaseline />
+            <Helmet>
+              <link
+                rel="stylesheet"
+                href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+                media="all"
+              />
+            </Helmet>
+            <AppBar />
             <Component {...this.props} />
+            <Footer />
           </MuiThemeProvider>
         </JssProvider>
       )
     }
   }
-
-  return WithRoot
 }
 
-export default withRoot
+export default Layout

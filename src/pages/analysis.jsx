@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import Layout from '../components/templates/Layout'
+import React, { Component, Fragment } from 'react'
+import withLayout from '../components/templates/withLayout'
 import Helmet from 'react-helmet'
 import ImageCover from '../components/molecules/ImageCover'
 import analysisImage from '../assets/analysis.jpg'
@@ -40,7 +40,7 @@ class analysis extends Component {
     const { edges } = data.allMarkdownRemark
 
     return (
-      <Layout location={this.props.location}>
+      <Fragment>
         <Helmet title={'analysis'} />
         <ImageCover img={analysisImage} alt="analysis" />
         <div className={classes.root}>
@@ -55,12 +55,12 @@ class analysis extends Component {
             </Grid>
           </Grid>
         </div>
-      </Layout>
+      </Fragment>
     )
   }
 }
 
-export default withStyles(styles, { name: 'analysis' })(analysis)
+export default withLayout(withStyles(styles, { name: 'analysis' })(analysis))
 
 export const pageQuery = graphql`
   query {

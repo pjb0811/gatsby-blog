@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import Helmet from 'react-helmet'
-import Layout from '../templates/Layout'
+import withLayout from '../templates/withLayout'
 import ImageCover from '../molecules/ImageCover'
 import PostList from '../organisms/PostList'
 import { navigate } from 'gatsby-link'
@@ -17,12 +17,12 @@ class Index extends Component {
   }
 
   render() {
-    const { location, pageContext } = this.props
+    const { pageContext } = this.props
     const { group, index, pageCount, additionalContext } = pageContext
     const { siteMetadata } = additionalContext
 
     return (
-      <Layout location={location}>
+      <Fragment>
         <Helmet
           title={siteMetadata.title}
           meta={[
@@ -40,9 +40,9 @@ class Index extends Component {
           pageCount={pageCount}
           onPageChange={this.handlePageClick}
         />
-      </Layout>
+      </Fragment>
     )
   }
 }
 
-export default Index
+export default withLayout(Index)

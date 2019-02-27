@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import Helmet from 'react-helmet'
 import { Link, graphql } from 'gatsby'
-import Layout from '../templates/Layout'
+import withLayout from '../templates/withLayout'
 import Grid from '@material-ui/core/Grid'
 import { withStyles } from '@material-ui/core/styles'
 import PostNavigation from '../molecules/PostNavigation'
@@ -55,7 +55,7 @@ class BlogPost extends React.Component {
     }
 
     return (
-      <Layout location={this.props.location}>
+      <Fragment>
         <Helmet
           title={`${title}`}
           meta={[
@@ -121,12 +121,12 @@ class BlogPost extends React.Component {
             <PostNavigation {...this.props.pageContext} />
           </Grid>
         </div>
-      </Layout>
+      </Fragment>
     )
   }
 }
 
-export default withStyles(styles, { name: 'blogPost' })(BlogPost)
+export default withLayout(withStyles(styles, { name: 'blogPost' })(BlogPost))
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {

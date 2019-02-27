@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import Helmet from 'react-helmet'
 import { graphql } from 'gatsby'
-import Layout from '../components/templates/Layout'
+import withLayout from '../components/templates/withLayout'
 import TagList from '../components/organisms/TagList'
 import ImageCover from '../components/molecules/ImageCover'
 import tagImage from '../assets/tags.jpg'
@@ -47,7 +47,7 @@ class Tags extends Component {
     } = this.props
 
     return (
-      <Layout location={this.props.location}>
+      <Fragment>
         <Helmet title={title} />
         <ImageCover img={tagImage} alt="tags" />
         <div className={classes.root}>
@@ -62,12 +62,12 @@ class Tags extends Component {
             </Grid>
           </Grid>
         </div>
-      </Layout>
+      </Fragment>
     )
   }
 }
 
-export default withStyles(styles, { name: 'tags' })(Tags)
+export default withLayout(withStyles(styles, { name: 'tags' })(Tags))
 
 export const pageQuery = graphql`
   query {

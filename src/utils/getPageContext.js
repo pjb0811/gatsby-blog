@@ -28,7 +28,7 @@ function createPageContext() {
     sheetsRegistry: new SheetsRegistry(),
     // The standard class name generator.
     generateClassName: createGenerateClassName({
-      dangerouslyUseGlobalCSS: true,
+      // dangerouslyUseGlobalCSS: true,
     }),
   }
 }
