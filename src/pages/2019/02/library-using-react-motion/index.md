@@ -19,6 +19,14 @@ react를 사용하여 개인적인 프로젝트를 진행하다보니 컴포넌�
 
 이 후 렌더링 시 `Function as children` 패턴을 통해 전달받은 함수의 인자를 활용하여 실제 애니메이션이 적용될 요소에 대한 `css` 속성을 적용하여 애니메이션 효과를 표현할 수 있다.
 
+```javascript
+<Motion style={{ x: spring(this.state.x) }}>
+  {({ x }) => <div style={{ transform: `translateX(${x}px)` }} />}
+</Motion>
+```
+
+기본적인 사용법에 대한 코드이다. `Motion` 컴포넌트의 props로 애니메이션 효과로 사용하고자 하는 스타일 요소에 대한 state를 `spring` 함수의 반환값으로 넘겨주며 이 후 자식요소는 함수로 구성되며 함수 인자로 전달받은 데이터를 통해 함수 반환 요소의 스타일 설정을 통해 필요한 애니메이션 효과를 구현할 수 있다.
+
 <figure>
   <iframe src="https://codesandbox.io/embed/01q1voo3jl?codemirror=1&fontsize=14" style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe>
 </figure>
