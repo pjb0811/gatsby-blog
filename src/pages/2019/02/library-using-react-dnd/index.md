@@ -128,14 +128,533 @@ export default DropTarget('box', boxTarget, (connect, monitor) => ({
 
 ## Multiple List
 
+해당 라이브러리를 통해 장바구니 기능과 같이 특정 목록 영역에 구현된 아이템을 다른 영역의 목록으로 드래그하여 옮길 수 있는 기능을 구현하고 싶었다. 우선 `react-dnd` 에서 제공하는 예제들을 통해 관련된 기능들을 확인해 봤는데 이와 관련된 기능들은 확인할 수 없었다.
+그래서 관련된 내용을 구글링하였고 이와 관련된 포스트를 발견하였고 해당 [포스트](https://rafaelquintanilha.com/sortable-targets-with-react-dnd/)를 참고하여 내가 필요로 하는 기능들이 추가된 컴포넌트를 개발하였다.
+
+[`react-beautiful-dnd`](https://github.com/atlassian/react-beautiful-dnd)이라는 라이브러리의 경우 멀티플 리스트 및 애니메이션 효과를 가지는 드래그 앤 드롭과 관련된 여러가지 기능을 제공하고 있어 해당 라이브러리를 사용해도 되지만 리스트 구현 수직 또는 수평 구조의 리스트의 기능만 제공하여 내가 원하는 그리드 형태의 목록을 제공하지 않았기 때문에 직접 그리드 형태의 멀티플 리스트에서 드래그 앤 드롭 기능을 제공할 수 있는 컴포넌트를 구현했다.
+
+```javascript
+import React, { Component } from 'react'
+import List from './List'
+import { DragDropContext } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+
+class App extends Component {
+  render() {
+    // ...
+
+    return (
+      <div>
+        <List
+          name={'test1'}
+          id={1}
+          width={50}
+          height={50}
+          rows={3}
+          style={{
+            background: 'yellow',
+            margin: '0 0 20px',
+          }}
+          activeStyle={{
+            background: 'red',
+          }}
+          onChange={state => {}}
+        >
+          <div>1</div>
+          <div>2</div>
+          <div>3</div>
+        </List>
+
+        <List
+          name={'test1'}
+          id={2}
+          width={50}
+          height={50}
+          rows={3}
+          style={{
+            background: 'orange',
+          }}
+          activeStyle={{
+            background: 'blue',
+          }}
+        >
+          <div>4</div>
+          <div>5</div>
+          <div>6</div>
+        </List>
+      </div>
+    )
+  }
+}
+
+export default DragDropContext(HTML5Backend)(App)
+```
+
+여러개의 리스트의 포함된 아이템들을 드래그할 수 있도록 구현한 `List` 컴포넌트의 사용법을 정리한 코드이다. `name` 이라는 props를 통해 여러개의 리스트가 같은 아이템을 포함할 수 있도록 설정해 줄 수 있다. 해당 타입은 문자열로 구분하며 같은 `name`의 인자를 전달받는 컴포넌트의 자식 요소를 공유할 수 있도록 했다. 다만 같은 `name`으로 설정된 컴포넌트의 경우 `id`라는 props를 통해 고유의 값을 지정해야한다.
+
+`rows` 의 경우 목록의 열의 개수를 지정할 수 있다. 기본값은 1열로 구성된 목록이며 `rows` 설정에 따라 수직, 수평 이동 가능한 목록을 구성할 수 있도록 했다. 또한 `style` 및 `activeStyle` props를 통해 기본 스타일과 드래그 활성화 시 목록의 스타일을 지정할 수 있는 기능을 구현했다.
+
+- `List.tsx`
+
+```javascript
+import * as React from 'react'
+import Item from './Item'
+import { DropTarget } from 'react-dnd'
+
+type Props = {
+  id: string | number,
+  name: string | number,
+  width: number,
+  height: number,
+  rows: number,
+  style: any,
+  activeStyle: any,
+  canDrop: boolean,
+  isOver: boolean,
+  connectDropTarget: any,
+  onChange: (state: State) => void,
+}
+
+const itemTarget = {
+  drop(props: any, monitor: any, component: any) {
+    const { id, name } = props
+    const sourceObj = monitor.getItem()
+
+    if (name === sourceObj.listName && id !== sourceObj.listId) {
+      component.pushItem(sourceObj.item)
+    }
+
+    return {
+      listId: id,
+      listName: name,
+    }
+  },
+}
+
+@DropTarget('ITEM', itemTarget, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  canDrop: monitor.canDrop(),
+}))
+class Container extends React.Component<Props, State> {
+  state = {
+    list: [],
+  }
+
+  componentDidMount() {
+    const { id, children } = this.props
+    const newChildren = Array.isArray(children)
+      ? [...children]
+      : children
+      ? [children]
+      : []
+
+    this.setState({
+      list: newChildren.map((child, i) => {
+        return {
+          id: `${id}${i}`,
+          child,
+        }
+      }),
+    })
+  }
+
+  pushItem = (item: never) => {
+    const { onChange = () => {} } = this.props
+    const list = this.state.list.concat()
+    list.push(item)
+
+    this.setState(
+      {
+        list,
+      },
+      () => {
+        onChange(this.state)
+      }
+    )
+  }
+
+  removeItem = (index: number) => {
+    const { onChange = () => {} } = this.props
+    let list = this.state.list.concat()
+    list.splice(index, 1)
+
+    this.setState(
+      {
+        list,
+      },
+      () => {
+        onChange(this.state)
+      }
+    )
+  }
+
+  moveItem = (dragIndex: number, hoverIndex: number) => {
+    let list = this.state.list.concat()
+    const dragItem = list[dragIndex]
+    const { onChange = () => {} } = this.props
+
+    list.splice(dragIndex, 1)
+    list.splice(hoverIndex, 0, dragItem)
+
+    this.setState(
+      {
+        list,
+      },
+      () => {
+        onChange(this.state)
+      }
+    )
+  }
+
+  render() {
+    const {
+      width = 200,
+      height = 200,
+      rows = 1,
+      style,
+      activeStyle,
+      canDrop,
+      isOver,
+      connectDropTarget,
+    } = this.props
+    const { list } = this.state
+    const isActive = canDrop && isOver
+    const listStyle = isActive ? activeStyle : style
+
+    return connectDropTarget(
+      <div
+        style={{
+          ...listStyle,
+          display: 'flex',
+          width: width * rows,
+          height: list.length ? height * Math.ceil(list.length / rows) : height,
+          minHeight: height,
+          overflow: 'auto',
+          flexWrap: 'wrap',
+        }}
+      >
+        {list.map((item: { id: number }, i) => {
+          return (
+            <Item
+              key={item.id}
+              index={i}
+              item={item}
+              listId={this.props.id}
+              listName={this.props.name}
+              removeItem={this.removeItem}
+              moveItem={this.moveItem}
+            />
+          )
+        })}
+      </div>
+    )
+  }
+}
+
+export default Container
+```
+
+앞서 설명한 `List` 컴포넌트를 구현한 코드이다. 우선 드롭 영역으로 설정하기 위한 `DropTarget` 고차함수를 `decorator` 문법을 통해 설정하도록 했다. `DropTarget` 설정 시 인수로 전달받는 `itemTarget` 객체에 설정된 `drop` 함수를 통해 다른 목록으로부터 드래그 된 아이템 요소를 감자하여 현재 목록에 추가해줄 수 있도록 설정했다. 이 후 마운트 시 각 아이템 요소의 기본키를 props로 전달받은 `id`를 통해 설정해주도록 했다. 목록 내 컴포넌트 드래그 시에는 `pushItem`, `removeItem`, `moveItem` 함수를 통해 컴포넌트 내부 요소의 드래그 이벤트를 처리하거나 함수를 인자로 전달하도록 구현했다.
+
+- `Item.tsx`
+
+```javascript
+import * as React from 'react';
+import {
+  DragSource,
+  DropTarget,
+  ConnectDragSource,
+  ConnectDropTarget,
+  DropTargetMonitor,
+  DragSourceMonitor
+} from 'react-dnd';
+import { findDOMNode } from 'react-dom';
+import { XYCoord } from 'dnd-core';
+
+type Props = {
+  index: number;
+  listId: string | number;
+  listName: string | number;
+  item: any;
+  style: any;
+  isDragging?: boolean;
+  connectDragSource?: ConnectDragSource;
+  connectDropTarget?: ConnectDropTarget;
+  removeItem: (index: number) => void;
+  moveItem: (dragIndex: number, hoverIndex: number) => void;
+};
+
+const itemTarget = {
+  hover(props: Props, monitor: DropTargetMonitor, component: Element) {
+    const dragIndex = monitor.getItem().index;
+    const hoverIndex = props.index;
+    const sourceListId = monitor.getItem().listId;
+    const sourceListName = monitor.getItem().listName;
+
+    if (dragIndex === hoverIndex) {
+      return;
+    }
+
+    const hoverBoundingRect = (findDOMNode(
+      component
+    ) as Element).getBoundingClientRect();
+    const hoverMiddleX = (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
+    const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+    const clientOffset = monitor.getClientOffset();
+    const hoverClientX = (clientOffset as XYCoord).x - hoverBoundingRect.left;
+    const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
+
+    if (dragIndex < hoverIndex) {
+      if (hoverClientX < hoverMiddleX / 2 || hoverClientY < hoverMiddleY / 2) {
+        return;
+      }
+    }
+
+    if (dragIndex > hoverIndex) {
+      if (hoverClientX > hoverMiddleX || hoverClientY > hoverMiddleY) {
+        return;
+      }
+    }
+
+    if (props.listName === sourceListName && props.listId === sourceListId) {
+      props.moveItem(dragIndex, hoverIndex);
+      monitor.getItem().index = hoverIndex;
+    }
+  }
+};
+
+const itemSource = {
+  beginDrag(props: Props) {
+    return {
+      index: props.index,
+      listId: props.listId,
+      listName: props.listName,
+      item: props.item
+    };
+  },
+
+  endDrag(props: Props, monitor: DragSourceMonitor) {
+    const item = monitor.getItem();
+    const dropResult = monitor.getDropResult();
+
+    if (
+      dropResult &&
+      dropResult.listName === item.listName &&
+      dropResult.listId !== item.listId
+    ) {
+      props.removeItem(item.index);
+    }
+  }
+};
+
+@DropTarget('ITEM', itemTarget, connect => ({
+  connectDropTarget: connect.dropTarget()
+}))
+@DragSource('ITEM', itemSource, (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging()
+}))
+class Item extends React.Component<Props> {
+  constructor(props: Props) {
+    super(props);
+  }
+
+  render() {
+    const {
+      item,
+      isDragging,
+      connectDragSource,
+      connectDropTarget
+    } = this.props;
+    const opacity = isDragging ? 0 : 1;
+
+    return (
+      connectDragSource &&
+      connectDropTarget &&
+      connectDragSource(
+        connectDropTarget(
+          <div style={{ opacity, position: 'relative' }}>{item.child}</div>
+        )
+      )
+    );
+  }
+}
+
+export default Item;
+```
+
+목록 내 요소에 대한 `Item` 컴포넌트를 구현한 코드이다. 해당 컴포넌트의 경우 드래그 및 드롭 이벤트를 처리하기 위해 `DragSource`와 `DropTarget` 고차함수를 설정했다. `DragSource`의 경우 아이템 드래그 시 목록에서 해당 아이템을 제거하는 기능을 처리하면 `DropTarget`의 경우 현재 드래그하는 요소의 위치에 따라 목록 내 요소의 위치를 변경하도록 구현했다.
+
 <figure>
   <iframe src="https://codesandbox.io/embed/ll724prxrq?fontsize=14" style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe>
 </figure>
 
+앞서 구현한 `List`, `Item` 컴포넌트를 활용한 간단한 예제 코드이다. 두개의 리스트로 구성되어 있으며 리스트에 포함된 요소들의 대하여 서로 다른
+목록으로 드래그할 수 있도록 구현되어 있다. 현재 컴포넌트 드래그 시 목록 내 요소들이 이동하는 경우 별다른 애니메이션 효과가 추가되어 있지 않아 `react-motion`을 활용하여 애니메이션 효과를 나타낼 수 있도록 추가 기능을 구현 중인데 목록 내 요소가 많을 경우 퍼포먼스에 문제가 있어 해결 방법을 찾고 있는 중이다. 빠른 시일내에 해당 문제를 해결할 수 있도록 하자.
+
 ## Native Files
+
+두 번째로 만들어본 컴포넌트는 데스크탑의 파일을 브라우저 영역으로 드래그 앤 드롭해주는 간단한 컴포넌트이다. 해당 기능의 경우 `react-dnd`에서 기본적으로 제공하는 기능으로 특별히 추가해 줄 기능은 없지만 파일을 드롭한 이후 드롭된 파일 요소를 삭제하는 기능이 없어 해당 기능을 추가한 컴포넌트를 구현했다.
+
+```javascript
+import React from 'react'
+import NativeFiles from './NativeFiles'
+import { DragDropContext } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import FileList from './FileList'
+
+class App extends React.Component {
+  render() {
+    return (
+      <NativeFiles>
+        {({ files, canDrop, isOver, removeFiles }) => {
+          return (
+            <FileList
+              files={files}
+              canDrop={canDrop}
+              isOver={isOver}
+              removeFile={removeFiles}
+            />
+          )
+        }}
+      </NativeFiles>
+    )
+  }
+}
+
+export default DragDropContext(HTML5Backend)(App)
+```
+
+네이티브 파일 영역에 대한 드래그 앤 드롭 컴포넌트를 사용하기 위한 기본적인 예제 코드이다. 컴포넌트 사용 시 따로 설정해주는 props를 없지만 하위 요소의 경우 `Function as Child` 컴포넌트로 반환되며 해당 함수의 인자를 통해 드래그 및 드롭과 관련된 이벤트를 전달받을 수 있도록 구현했다. `files`을 통해 드롭된 파일 객체 정보를 확인 가능하며, `canDrop`, `isOver` 값을 통해 파일의 드래그 상태를 확인할 수 있다. `removeFile`의 경우 함수 타입의 인자로서 실행 시 현재 드롭된 파일 목록을 초기화해 줄 수 있다.
+
+- `NativeFiles.tsx`
+
+```javascript
+import * as React from 'react'
+import { DropTargetMonitor } from 'react-dnd'
+import { NativeTypes } from 'react-dnd-html5-backend'
+import TargetBox from './TargetBox'
+
+type Props = {
+  children: (props: any) => JSX.Element,
+}
+
+type State = {
+  files: any[],
+}
+
+class Container extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = { files: [] }
+  }
+
+  render() {
+    const { FILE } = NativeTypes
+    const { children } = this.props
+    const { files } = this.state
+
+    return (
+      <TargetBox
+        accepts={[FILE]}
+        files={files}
+        onDrop={this.handleFileDrop}
+        children={children}
+        removeFiles={this.removeFiles}
+      />
+    )
+  }
+
+  handleFileDrop = (_item: any, monitor: DropTargetMonitor) => {
+    if (monitor) {
+      const files = monitor.getItem().files
+      this.setState({ files })
+    }
+  }
+
+  removeFiles = () => {
+    this.setState({
+      files: [],
+    })
+  }
+}
+
+export default Container
+```
+
+앞서 사용한 `NativeFiles` 컴포넌트의 구현한 내용이다. 네이티브 파일에 대한 정보를 컴포넌트의 state 로 설정한 뒤 `TargetBox` 컴포넌트의 전달해주도록 했다. 파일 드롭 및 제거 함수 또한 props로 전달하여 함수 실행 시 현재 컴포넌트의 state에 설정된 파일 정보를 업데이트 할 수 있도록 구현했다.
+
+- `TargetBox.tsx`
+
+```javascript
+import * as React from 'react'
+import {
+  DropTarget,
+  DropTargetConnector,
+  ConnectDropTarget,
+  DropTargetMonitor,
+} from 'react-dnd'
+
+const boxTarget = {
+  drop(props: Props, monitor: DropTargetMonitor) {
+    if (props.onDrop) {
+      props.onDrop(props, monitor)
+    }
+  },
+}
+
+type Props = {
+  accepts: string[],
+  connectDropTarget?: ConnectDropTarget,
+  isOver?: boolean,
+  canDrop?: boolean,
+  onDrop: (props: Props, monitor: DropTargetMonitor) => void,
+  files: any[],
+  children: (props: any) => JSX.Element,
+  removeFiles: () => void,
+}
+
+@DropTarget(
+  (props: Props) => props.accepts,
+  boxTarget,
+  (connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    canDrop: monitor.canDrop(),
+  })
+)
+class TargetBox extends React.Component<Props> {
+  render() {
+    const {
+      canDrop,
+      isOver,
+      connectDropTarget,
+      files,
+      children,
+      removeFiles,
+    } = this.props
+
+    return (
+      connectDropTarget &&
+      connectDropTarget(
+        <div>{children({ canDrop, isOver, files, removeFiles })}</div>
+      )
+    )
+  }
+}
+
+export default TargetBox
+```
+
+`NativeFiles`에서 전달받은 props를 사용자가 구현한 컴포넌트에 전달하게 해주는 `TargetBox` 컴포넌트를 구현한 코드이다. 렌더링 시 `DropTarget` 고차함수를 통해 사용자로부터 전달받은 컴포넌트의 파일 정보를 주입한 뒤 반환하도록 구현했다.
 
 <figure>
   <iframe src="https://codesandbox.io/embed/6j6x9jp183?fontsize=14" style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe>
 </figure>
 
+앞서 구현한 컴포넌트를 활용한 예제 코드이며 드롭된 파일명을 화면에 표시하며 해당 파일 목록을 초기화 시키는 버튼으로 구성된 컴포넌트를 구성되어 있다.
+
 ## 글을 마치며
+
+`react-dnd`라는 라이브러리를 통해 내가 필요로 했던 몇가지 컴포넌트를 새로 만들어 본 내용들을 정리해봤는데 막상 글로 정리하려고 하니 잘 되지 않는 것 같다. 해당 컴포넌트들을 구현하고 나서 바로 글을 작성했다면 좀 더 좋았을 것 같은데 시간이 지나고나서 이 전에 만들었던 개발 내용들을 정리하려보니 생각보다 정리하는게 쉽지 않다고 느껴진다. 사실 앞으로 구상 중인 개인적인 프로젝트를 진행하기 위해 코드를 짜고 있는데, 그 전에 블로그를 시작하면서 이 전에 해왔던 것들을 기록해야겠다는 생각때문인지 시간에 쫓기면서 글을 쓴거 같기도 하다. 그래도 그 동안 개발자로 일해오면서 스스로 내 자신을 정리하지 못한 시간들이 많았기 때문에 앞으로 시간이 난다면 꾸준히 글을 정리할 수 있도록 하자.
