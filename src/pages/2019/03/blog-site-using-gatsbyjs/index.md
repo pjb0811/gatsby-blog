@@ -1,6 +1,6 @@
 ---
 title: Gatsby.js 를 활용한 블로그 개발
-date: '2019-03-01'
+date: '2019-03-30'
 mainImage: './gatsbyjs.png'
 tags: ['react', 'javascript']
 ---

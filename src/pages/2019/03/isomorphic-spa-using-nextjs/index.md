@@ -231,7 +231,7 @@ function About() {
 export default About
 ```
 
-## Custom <App>
+## Custom App
 
 `Next.js`는 내부적으로 `next/app` 컴포넌트를 통해 페이지를 초기하며 필요한 경우 직접 `next/app` 컴포넌트 설정을 통해 페이지 정보를 제어 할 수 있다. 재정의 하는 경우 `/pages/_app.js` 파일을 통해 `App`을 상속받는 컴포넌트의 재정의가 필요하다.
 
@@ -264,7 +264,7 @@ class MyApp extends App {
 export default MyApp
 ```
 
-## Custom <Document>
+## Custom Document
 
 `pages` 경로의 설정된 페이지의 기본적인 마크업 구조는 `next/document` 컴포넌트의 통해 정의된다. 해당 컴포넌트의 경우 서버 측에서만 렌더링되며 초기 서버 측 렌더링에 대한 마크업을 변경하는 데 사용된다. 주로 앞서 언급한 `styled-components`와 같은 `css-in-js` 라이브러리의 서버 측 렌더링을 구현하는 경우 사용되며 `styled-jsx`의 경우 기본적으로 서버 렌더링 설정에 포함되어 있다. 기본 마크업을 재정의하려면 `/pages/\_document.js` 파일을 통해 `Document` 클래스를 재정의 할 수있는 컴포넌트가 필요하다.
 
