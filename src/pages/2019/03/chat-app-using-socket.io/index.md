@@ -549,7 +549,7 @@ class Chat extends Component {
 
 마운트 해제 시에는 `mounted`라는 프로퍼티를 통해 컴포넌트 언마운트 이후 상태 변경을 차단하도록 설정했으며, 언마운트 시 현재 사용자에 대한 채팅방 퇴장 이벤트를 서버로 송신하도록 했다.
 
-또한 수신받은 이벤트에 따라 전달받은 메시지 정보를 state에 업데이트, 메시지 정보를 서버로 송신해주는 함수를 호출하게 된다.
+또한 수신받은 이벤트에 따라 전달받은 메시지 정보를 state에 업데이트할 수 있도록 하기 위해 메시지 정보를 서버로 송/수신해주는 함수로 구현되어 있다.
 
 ![join-leave](./join-leave.gif)
 
@@ -557,7 +557,7 @@ class Chat extends Component {
 
 ![image](./image.gif)
 
-현재 컴포넌트에 설정된 기능에 따라 채팅방 입장/퇴장 및 메시지 전송을 구현한 화면이다.
+현재 컴포넌트에 설정된 기능에 따라 채팅방 입장/퇴장 및 메시지 전송을 구현한 화면이다. 사용자가 채널에 입장/퇴장 시 화면 상단에 애니메이션을 활용하여 사용자의 아이디를 표시해주며 채팅 메시지 입력 시에는 해당 메시지롤 화면에 표시하도록 구현했다. 이미지 메시지의 경우 `drag & drop` 기능을 활용하여 메시지를 전달할 수 있도록 했다.
 
 ### Server
 
@@ -635,10 +635,291 @@ socket.on('leave', ({ room, user }) => {
 })
 ```
 
+채팅방 입장/퇴장 및 채팅 메시지 전달에 대한 서버 측 소켓 구현 코드이다. 채널 입장에 대한 이벤트 송신 시에는 `join` 메서드와 인자를 전달받은 `room` 정보를 통해 채팅방에 입장하며, 새롭게 전달받은 소켓ID를 통해 전채 사용자 목록 내 현재 사용자 정보를 갱신하도록 구현했다. 이 후 현재 사용자와 전체 사용자에게 갱신된 사용자 정보를 전달할 수 있도록 클라이언트로 송신하는 이벤트를 호출하였다. 또한 현재 채널에 포함된 사용자에게 사용자가 입장했다는 메시지를 전달하는 클라이언트 송신 이벤트를 구현했다. 이후 채팅 메시지를 송신하는 경우 인자로 전달받은 채팅방 정보, 사용자 정보, 메시지 종류, 텍스트/이미지 메시지를 현재 채팅방 사용자에게 전달하도록 구현했다.
+
+채팅방 퇴장 시에는 현재 사용자가 가지고 있는 채팅방 정보를 초기화한 후 전체 사용자에게 해당 정보를 송신하도록 했다. 이 후 퇴장하는 채팅방에 포함된 사용자에게 현재 사용자에 대한 퇴장 메시지를 전달하도록 구현했다. 현재 사용자에게는 채팅방 내 메시지 목록를 삭제한 뒤 `leave` 메서드와 `room` 정보를 통해 현재 채팅방에서 퇴장하도록 구현했다.
+
 ## 테스트
 
 ### Client
 
+테스트 환경의 경우 `mocha`와 `enzyme`을 이용하여 기본 환경을 구성했다. 각각의 컴포넌트에 대한 단위 테스트를 실행할 수 있도록 구현하였으며 `BDD` 기반으로 구현하였다. `Assertion` 라이브러리의 경우 `chai`를 활용하였고 해당 라이브러리에서 제공하는 `expect` 함수를 통해 코드를 검증할 수 있도록 했다.
+
+```bash
+--require @babel/register
+--file test/mocha.setup.js
+--watch
+test/**/*.test.js
+```
+
+```javascript
+import Enzyme from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
+import 'jsdom-global/register'
+
+Enzyme.configure({ adapter: new Adapter() })
+```
+
+테스트 스크립트 실행 시 `mocha` 옵션 설정을 통해 테스트 코드 실행 전 호출해야 할 파일을 설정하도록 했다. 실행 전 호출 파일에서는 `enzyme` 활용 시 React의 버전 설정을 맞추기 위한 어뎁터를 설정해주었다. 구현한 테스트 코드 또한 앞서 설명한 코드들과 마찬가지로 모든 코드를 설명하기에는 양이 많기 때문에 구현된 테스트 코드 중 일부에 대한 내용만 간략히 설명하려고 한다.
+
+```javascript
+describe('<ConnectForm />', () => {
+  const initialValues = {
+    userId: '',
+  }
+
+  const onSubmit = (values, { setSubmitting }) => {
+    setTimeout(() => {
+      setSubmitting(false)
+    }, 100)
+  }
+
+  const wrapper = mount(
+    <Formik
+      initialValues={initialValues}
+      validationSchema={Yup.object().shape({
+        userId: Yup.string()
+          .min(3, '3글자 이상 입력해주세요')
+          .required('ID를 입력해주세요'),
+      })}
+      onSubmit={onSubmit}
+      render={({ submitForm, isSubmitting }) => (
+        <ConnectForm submitForm={submitForm} isSubmitting={isSubmitting} />
+      )}
+    />
+  )
+
+  const input = wrapper.find('input')
+  const button = wrapper.find('button')
+
+  it('기본 props 전달 확인', () => {
+    expect(wrapper.props().onSubmit).to.equal(onSubmit)
+    expect(wrapper.props().initialValues).to.deep.equal(initialValues)
+  })
+
+  it('id input 창 입력 확인', () => {
+    input.simulate('change', { target: { value: 'Hello' } })
+    expect(input.instance().value).to.equal('Hello')
+  })
+
+  it('id 팔수 입력 유효성 검사 확인', done => {
+    input.simulate('change', { target: { value: '' } })
+    expect(input.instance().value).to.equal('')
+    setTimeout(() => {
+      expect(wrapper.state().errors).to.deep.equal({
+        userId: 'ID를 입력해주세요',
+      })
+      done()
+    }, 100)
+  })
+
+  it('id 글자 길이 유효성 검사 확인', done => {
+    input.simulate('change', { target: { value: '1' } })
+    expect(input.instance().value).to.equal('1')
+    setTimeout(() => {
+      expect(wrapper.state().errors).to.deep.equal({
+        userId: '3글자 이상 입력해주세요',
+      })
+      done()
+    }, 100)
+  })
+
+  it('유효성 검사 실패시 접속 버튼 활성화 여부 확인', () => {
+    expect(button.prop('disabled')).to.be.false
+  })
+
+  it('유효성 검사 성공 시 submit 이벤트 확인', done => {
+    input.simulate('change', { target: { value: 'success' } })
+    button.simulate('click')
+    expect(wrapper.state().isSubmitting).to.be.true
+    setTimeout(() => {
+      expect(wrapper.state().isSubmitting).to.be.false
+      done()
+    }, 200)
+  })
+})
+```
+
+이벤트 제어 관련 컴포넌트
+enzyme에서 제공하는 simulate()함수를 활용한 컴포넌트 테스트
+
+```javascript
+describe('<AsyncImage />', () => {
+  const props = {
+    image: { name: 'test.js', type: 'image', base64: 'base64' },
+  }
+
+  let file = {}
+
+  const wrapper = mount(
+    <AsyncImage {...props}>
+      {props => <img src={props.base64} alt={props.name} />}
+    </AsyncImage>
+  )
+
+  it('기본 props 전달 확인', () => {
+    expect(wrapper.props().image).to.deep.equal(props.image)
+  })
+
+  it('이미지 파일 props 전달 확인', () => {
+    file = new File(['test'], './test.jpg', {
+      type: 'image/jpg',
+    })
+    wrapper.setProps({ image: file })
+    expect(wrapper.props().image).to.deep.equal(file)
+  })
+
+  it('setImage() 실행 시 이미지 파일명 확인', () => {
+    wrapper.instance().setImage()
+    expect(wrapper.state().image.name).to.equal('.:test.jpg')
+  })
+
+  it('shouldComponentUpdate 호출 시 반환값 확인', () => {
+    expect(
+      wrapper.instance().shouldComponentUpdate(wrapper.props(), wrapper.state())
+    ).to.be.false
+
+    expect(
+      wrapper
+        .instance()
+        .shouldComponentUpdate(wrapper.props(), { image: { name: 'test3' } })
+    ).to.be.true
+
+    expect(
+      wrapper.instance().shouldComponentUpdate(wrapper.props(), {
+        image: { name: undefined },
+      })
+    ).to.be.true
+  })
+
+  it('componentDidUpdate 호출 후 이미지 파일명 확인', done => {
+    file = new File(['test1'], './test1.jpg', {
+      type: 'image/jpg',
+    })
+    wrapper.setProps({ image: file })
+    wrapper.instance().componentDidUpdate()
+    setTimeout(() => {
+      expect(wrapper.state().image.name).to.equal('.:test1.jpg')
+      done()
+    }, 100)
+  })
+
+  it('function as child props 확인', () => {
+    const childWrapper = mount(wrapper.props().children(wrapper.state().image))
+    expect(childWrapper.props().alt).to.equal('.:test1.jpg')
+  })
+})
+```
+
+앞선 코드에서 따로 설명하진 않았지만 이미지 파일에 대한 `Drag & Drop` 기능을 제공하는 컴포넌트에 대한 테스트 코드에 대한 내용이다. 컴포넌트에 대한 검증 시 `File` 객체를 활용한 컴포넌트 호출 시 props로 전달받은 이미지 파일 정보가 정상적으로 state에 반영하는 지에 대해 테스트를 검증했다.
+
+```javascript
+describe('<Chat />', () => {
+  const store = initStore({})
+  const router = { query: { room: 'moon' } }
+  const props = {
+    classes: {},
+  }
+  const user = {
+    userId: 'user',
+    socketId: 'user',
+  }
+
+  store.chat.setUser(user)
+
+  const wrapper = mount(
+    shallow(shallow(<Chat router={router} {...store} {...props} />).get(0)).get(
+      0
+    )
+  )
+
+  const wrappedComponent = wrapper.childAt(2).childAt(0)
+
+  const { chat } = wrapper.props()
+  wrapper.setState({ messages: [] })
+
+  chat.connect('http://localhost:9002')
+
+  it('props 확인', () => {
+    expect(wrapper.props().router).to.equal(router)
+    expect(chat).to.equal(store.chat)
+  })
+
+  it('사용자 채널 입장 시 동작 확인 및 receiveMessage() 호출 시 상태 확인', done => {
+    chat.socket.on('join', data => {
+      wrappedComponent.instance().receiveMessage(data)
+      expect(wrappedComponent.state().messages.length).to.equal(1)
+      done()
+    })
+
+    chat.socket.emit('join', {
+      user,
+      room: 'moon',
+    })
+  })
+
+  it('sendMessage() 호출 시 chat socket 동작 확인', done => {
+    wrappedComponent
+      .instance()
+      .sendMessage({ type: 'text', message: 'test입니다', images: [] })
+    chat.socket.on('chat', data => {
+      const { messages } = data
+      const { user, type, message } = messages
+      wrappedComponent.instance().receiveMessage(data)
+      expect(user.userId).to.equal('user')
+      expect(type).to.equal('text')
+      expect(message).to.equal('test입니다')
+      expect(wrappedComponent.state().messages.length).to.equal(2)
+      done()
+    })
+  })
+
+  it('leave socket 동작 확인 및 receiveMessage() 호출 시 동작 상태 확인', done => {
+    chat.socket.emit('leave', {
+      user,
+      room: 'moon',
+    })
+    chat.socket.on('leave', data => {
+      const { messages } = data
+      const { user, type, message } = messages
+      expect(user.userId).to.equal('user')
+      expect(type).to.equal('info')
+      expect(message).to.equal('user님이 퇴장했습니다.')
+      wrappedComponent.instance().receiveMessage(data)
+      expect(wrappedComponent.state().messages.length).to.equal(3)
+      done()
+    })
+  })
+})
+```
+
+소켓 연동 관련 컴포넌트
+socket 연동에 필요한 test 서버를 통해 소켓 송/수신 컴포넌트 테스트
+
+실행결과
+총 76개의 단위 테스트 확인
+
 ### Server
 
+```javascript
+const express = require('express')()
+const server = require('http').createServer(express)
+const chatServer = require('./chat')
+const port = parseInt(process.env.PORT, 10) || 3000
+chatServer(server)
+
+server.listen(port, err => {
+  if (err) {
+    throw err
+  }
+  console.log(`> Ready on port ${port}`)
+})
+```
+
 ## 글을 마치며
+
+Storybook 또는 Selenium을 활용한 UI 및 통합 테스트 환경 구현
+typescript를 활용한 리팩토링
+컴포넌트 퍼포먼스 개선 및 최적화
+사용자간 1대 1 채팅창 기능 구현 등 부족하다고 생각되는 서비스 추가
+firebase 또는 now를 활용한 배포 기능 추가
