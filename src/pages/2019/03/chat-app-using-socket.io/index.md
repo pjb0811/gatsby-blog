@@ -702,7 +702,7 @@ describe('<ConnectForm />', () => {
     expect(input.instance().value).to.equal('Hello')
   })
 
-  it('id 팔수 입력 유효성 검사 확인', done => {
+  it('id 필수 입력 유효성 검사 확인', done => {
     input.simulate('change', { target: { value: '' } })
     expect(input.instance().value).to.equal('')
     setTimeout(() => {
@@ -740,8 +740,7 @@ describe('<ConnectForm />', () => {
 })
 ```
 
-이벤트 제어 관련 컴포넌트
-enzyme에서 제공하는 simulate()함수를 활용한 컴포넌트 테스트
+기본적으로 테스트 시 구현한 부분은 특정 조건에 따른 props와 state의 값을 정상적으로 검증되는지에 대한 내용으로 구성되어 있다. 또 한 사용자의 이벤트 제어와 관련된 컴포넌트들의 경우 `enzyme`에서 제공하는 `simulate` 함수를 활용한 컴포넌트 테스트를 할 수 있도록 구현했다. 위 코드는 로그인 시 사용자 검증에 대한 컴포넌트로서 기본적인 컴포넌트 상태 정보와 사용자 제어 이벤트에 대한 시뮬레이션을 통해 유효성 및 UI 영역에 대한 테스트를 검증하도록 구현되어 았다.
 
 ```javascript
 describe('<AsyncImage />', () => {
@@ -893,8 +892,7 @@ describe('<Chat />', () => {
 })
 ```
 
-소켓 연동 관련 컴포넌트
-socket 연동에 필요한 test 서버를 통해 소켓 송/수신 컴포넌트 테스트
+소켓 연동과 관련된 컴포넌트의 경우 소켓 연동에 필요한 test 서버를 통해 소켓 송/수신 컴포넌트를 테스트할 수 있도록 구현했다.
 
 실행결과
 총 76개의 단위 테스트 확인
